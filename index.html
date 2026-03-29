@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIBE:ADVANCED — Full-Stack Course</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0b;
+      --paper: #f4f0e8;
+      --paper2: #ece8df;
+      --rule: #d4cfc4;
+      --faint: #c8c3b7;
+      --accent: #c84b2f;
+      --accent2: #2563a8;
+      --gold: #b8860b;
+      --mono: 'DM Mono', monospace;
+      --serif: 'Instrument Serif', serif;
+      --display: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--rule) 1px, transparent 1px),
+        linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Ink bleed top-left */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -120px; left: -120px;
+      width: 500px; height: 500px;
+      background: radial-gradient(ellipse at 30% 30%, rgba(200,75,47,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      border-bottom: 2px solid var(--ink);
+      padding: 28px 0 20px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .logo {
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .header-meta {
+      font-size: 11px;
+      color: var(--faint);
+      letter-spacing: 0.08em;
+      text-align: right;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 72px 0 56px;
+      animation: fadeDown 0.7s 0.1s ease both;
+    }
+
+    .hero-kicker {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-kicker::before {
+      content: '';
+      display: inline-block;
+      width: 28px; height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(52px, 8vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      line-height: 1.8;
+      color: #4a4640;
+      max-width: 540px;
+      border-left: 2px solid var(--rule);
+      padding-left: 20px;
+    }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-section {
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: 24px 28px;
+      margin-bottom: 64px;
+      background: rgba(244,240,232,0.7);
+      backdrop-filter: blur(4px);
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .progress-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 12px;
+    }
+
+    .progress-bar-wrap {
+      background: var(--rule);
+      height: 3px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--faint);
+    }
+
+    /* ─── SECTION TITLE ─── */
+    .section-title {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ─── MODULE GRID ─── */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 2px;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .module-card {
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      padding: 28px 28px 24px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.18s ease, border-color 0.18s ease;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .module-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      transform: translateY(101%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 0;
+    }
+
+    .module-card:hover::before { transform: translateY(0); }
+    .module-card:hover { border-color: var(--ink); }
+    .module-card:hover .module-num { color: var(--accent); }
+    .module-card:hover .module-title { color: var(--paper); }
+    .module-card:hover .module-desc { color: var(--faint); }
+    .module-card:hover .module-tag { background: rgba(255,255,255,0.08); color: var(--faint); border-color: rgba(255,255,255,0.15); }
+    .module-card:hover .status-dot { border-color: var(--faint); }
+    .module-card:hover .status-dot.done { background: var(--accent); border-color: var(--accent); }
+
+    .module-card > * { position: relative; z-index: 1; }
+
+    .module-num {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--faint);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      transition: color 0.18s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid var(--rule);
+      transition: all 0.18s;
+    }
+
+    .status-dot.done { background: var(--gold); border-color: var(--gold); }
+    .status-dot.active { background: var(--accent); border-color: var(--accent); animation: pulse 2s ease infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.3); }
+    }
+
+    .module-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      line-height: 1.15;
+      margin-bottom: 10px;
+      transition: color 0.18s;
+    }
+
+    .module-desc {
+      font-size: 11px;
+      line-height: 1.7;
+      color: #6a6560;
+      margin-bottom: 18px;
+      transition: color 0.18s;
+    }
+
+    .module-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .module-tag {
+      font-size: 10px;
+      padding: 3px 8px;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      color: var(--faint);
+      letter-spacing: 0.06em;
+      transition: all 0.18s;
+    }
+
+    /* ─── SPECIAL CARDS ─── */
+    .module-card.capstone {
+      grid-column: 1 / -1;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .module-card.capstone::before { background: var(--accent); }
+    .module-card.capstone .module-num { color: rgba(255,255,255,0.3); }
+    .module-card.capstone .module-title { color: var(--paper); font-size: 28px; }
+    .module-card.capstone .module-desc { color: rgba(244,240,232,0.5); }
+    .module-card.capstone .module-tag { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); }
+    .module-card.capstone:hover .module-title { color: var(--paper); }
+    .module-card.capstone:hover .module-desc { color: rgba(244,240,232,0.7); }
+    .module-card.capstone .status-dot { border-color: rgba(255,255,255,0.2); }
+
+    /* ─── FLOW DIAGRAM ─── */
+    .flow-section {
+      margin: 64px 0;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+
+    .flow-diagram {
+      border: 1px solid var(--rule);
+      padding: 40px 28px;
+      background: rgba(244,240,232,0.5);
+      overflow-x: auto;
+    }
+
+    .flow-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      min-width: 680px;
+    }
+
+    .flow-phase {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-phase-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 16px;
+    }
+
+    .flow-nodes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .flow-node {
+      border: 1px solid var(--rule);
+      padding: 10px 14px;
+      font-size: 11px;
+      text-align: center;
+      background: var(--paper);
+      width: 90%;
+      line-height: 1.4;
+      cursor: default;
+      transition: all 0.18s;
+      position: relative;
+    }
+
+    .flow-node:hover {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .flow-node.highlight { border-color: var(--accent); color: var(--accent); font-weight: 500; }
+    .flow-node.capstone-node {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+      width: 95%;
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      padding-top: 36px;
+      color: var(--rule);
+      font-size: 18px;
+      flex-shrink: 0;
+      width: 28px;
+      justify-content: center;
+    }
+
+    /* ─── PROJECTS ─── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    .project-card {
+      border: 1px solid var(--rule);
+      padding: 28px 24px;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-number {
+      font-size: 64px;
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--rule);
+      line-height: 1;
+      margin-bottom: 16px;
+      transition: color 0.3s;
+    }
+
+    .project-card:hover .project-number { color: var(--accent); }
+
+    .project-name {
+      font-family: var(--serif);
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .project-stack {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--faint);
+    }
+
+    /* ─── STACK SECTION ─── */
+    .stack-row {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 64px;
+      animation: fadeUp 0.7s 0.5s ease both;
+    }
+
+    .stack-item {
+      flex: 1;
+      border: 1px solid var(--rule);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stack-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stack-name {
+      font-size: 11px;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .stack-role {
+      font-size: 10px;
+      color: var(--faint);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--faint);
+      letter-spacing: 0.1em;
+      animation: fadeUp 0.7s 0.6s ease both;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .modules-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .stack-row { flex-wrap: wrap; }
+      .stack-item { flex: 1 1 40%; }
+      h1 { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- HEADER -->
+    <header>
+      <div class="logo"><span>VIBE</span>:ADVANCED</div>
+      <div class="header-meta">
+        Personal learning journal<br>
+        Est. 2025 — ongoing
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-kicker">Advanced full-stack course</div>
+      <h1>Build real<br>things with <em>AI.</em></h1>
+      <p class="hero-sub">
+        You already know the vibe. Now ship production apps — 
+        React, Supabase, Cloudflare. Eight modules. Three projects. 
+        One capstone. All built by prompting your way through it.
+      </p>
+    </section>
+
+    <!-- PROGRESS -->
+    <div class="progress-section">
+      <div class="progress-label">// overall progress</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-stats">
+        <span id="progressText">0 of 8 modules complete</span>
+        <span id="progressPct">0%</span>
+      </div>
+    </div>
+
+    <!-- MODULES -->
+    <div class="section-title">Course modules</div>
+
+    <div class="modules-grid">
+
+      <a class="module-card" href="#module-1" onclick="markActive(1)">
+        <div class="module-num">01 — foundations <div class="status-dot active" id="dot-1"></div></div>
+        <div class="module-title">React<br>Foundations</div>
+        <div class="module-desc">JSX, components, hooks, and state — all scaffolded by prompting your AI. Build intuition by building things.</div>
+        <div class="module-tags">
+          <span class="module-tag">React 18</span>
+          <span class="module-tag">Vite</span>
+          <span class="module-tag">useState</span>
+          <span class="module-tag">useEffect</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-2" onclick="markActive(2)">
+        <div class="module-num">02 — technique <div class="status-dot" id="dot-2"></div></div>
+        <div class="module-title">Advanced<br>Prompting</div>
+        <div class="module-desc">Decompose complex problems. Chain prompts. Debug by describing. Turn any error into a lesson.</div>
+        <div class="module-tags">
+          <span class="module-tag">Prompt chains</span>
+          <span class="module-tag">Debugging</span>
+          <span class="module-tag">Iteration</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-3" onclick="markActive(3)">
+        <div class="module-num">03 — data <div class="status-dot" id="dot-3"></div></div>
+        <div class="module-title">Supabase<br>Database</div>
+        <div class="module-desc">Postgres + API + Auth in one. Tables, RLS policies, real-time subscriptions. Your backend, handled.</div>
+        <div class="module-tags">
+          <span class="module-tag">Supabase</span>
+          <span class="module-tag">Postgres</span>
+          <span class="module-tag">RLS</span>
+          <span class="module-tag">Real-time</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-4" onclick="markActive(4)">
+        <div class="module-num">04 — integration <div class="status-dot" id="dot-4"></div></div>
+        <div class="module-title">API<br>Integration</div>
+        <div class="module-desc">REST APIs, fetch(), environment variables, error handling. Pull live data into your app without fear.</div>
+        <div class="module-tags">
+          <span class="module-tag">REST</span>
+          <span class="module-tag">fetch()</span>
+          <span class="module-tag">env vars</span>
+          <span class="module-tag">async/await</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-5" onclick="markActive(5)">
+        <div class="module-num">05 — project I <div class="status-dot" id="dot-5"></div></div>
+        <div class="module-title">Build: The<br>Quiz App</div>
+        <div class="module-desc">Categories, timers, scores, auth, leaderboard. React + Supabase, deployed. Your first full-stack app.</div>
+        <div class="module-tags">
+          <span class="module-tag">Full-stack</span>
+          <span class="module-tag">Auth</span>
+          <span class="module-tag">Leaderboard</span>
+          <span class="module-tag">Deploy</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-6" onclick="markActive(6)">
+        <div class="module-num">06 — project II <div class="status-dot" id="dot-6"></div></div>
+        <div class="module-title">Build: Link-<br>in-Bio</div>
+        <div class="module-desc">Custom profile pages, link management, click tracking. Public URLs. Like Linktree, but yours.</div>
+        <div class="module-tags">
+          <span class="module-tag">Dynamic routes</span>
+          <span class="module-tag">Profiles</span>
+          <span class="module-tag">Click tracking</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-7" onclick="markActive(7)">
+        <div class="module-num">07 — deploy <div class="status-dot" id="dot-7"></div></div>
+        <div class="module-title">Cloudflare<br>Hosting</div>
+        <div class="module-desc">Pages, Workers, edge functions, custom domains. Deploy fast. Ship to the world for free.</div>
+        <div class="module-tags">
+          <span class="module-tag">CF Pages</span>
+          <span class="module-tag">Workers</span>
+          <span class="module-tag">Custom domain</span>
+        </div>
+      </a>
+
+      <a class="module-card" href="#module-8" onclick="markActive(8)">
+        <div class="module-num">08 — security <div class="status-dot" id="dot-8"></div></div>
+        <div class="module-title">Auth &amp;<br>Security</div>
+        <div class="module-desc">Supabase auth deep-dive, protected routes, RLS policies, OAuth. Keep your app locked down.</div>
+        <div class="module-tags">
+          <span class="module-tag">Auth</span>
+          <span class="module-tag">OAuth</span>
+          <span class="module-tag">Protected routes</span>
+          <span class="module-tag">RLS</span>
+        </div>
+      </a>
+
+      <a class="module-card capstone" href="#capstone" onclick="markActive(9)">
+        <div class="module-num">Capstone — final project <div class="status-dot" id="dot-9" style="border-color:rgba(255,255,255,0.2)"></div></div>
+        <div class="module-title">Your Full-Stack<br><em style="font-style:italic; color:var(--accent)">Mini-App</em></div>
+        <div class="module-desc">Pick your idea. Build it end-to-end. React + Supabase + Cloudflare + custom domain. Four weeks. Ship it.</div>
+        <div class="module-tags">
+          <span class="module-tag">React</span>
+          <span class="module-tag">Supabase</span>
+          <span class="module-tag">Cloudflare</span>
+          <span class="module-tag">Full deploy</span>
+          <span class="module-tag">Custom domain</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- FLOW DIAGRAM -->
+    <div class="flow-section">
+      <div class="section-title">Learning flow</div>
+      <div class="flow-diagram">
+        <div class="flow-inner">
+
+          <div class="flow-phase">
+            <div class="flow-phase-label">Phase 1 — Skill</div>
+            <div class="flow-nodes">
+              <div class="flow-node highlight">01 React</div>
+              <div class="flow-node highlight">02 Prompting</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">→</div>
+
+          <div class="flow-phase">
+            <div class="flow-phase-label">Phase 2 — Data</div>
+            <div class="flow-nodes">
+              <div class="flow-node highlight">03 Supabase</div>
+              <div class="flow-node highlight">04 APIs</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">→</div>
+
+          <div class="flow-phase">
+            <div class="flow-phase-label">Phase 3 — Build</div>
+            <div class="flow-nodes">
+              <div class="flow-node highlight">05 Quiz App</div>
+              <div class="flow-node highlight">06 Link-in-Bio</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">→</div>
+
+          <div class="flow-phase">
+            <div class="flow-phase-label">Phase 4 — Ship</div>
+            <div class="flow-nodes">
+              <div class="flow-node highlight">07 Cloudflare</div>
+              <div class="flow-node highlight">08 Auth</div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">→</div>
+
+          <div class="flow-phase">
+            <div class="flow-phase-label">Capstone</div>
+            <div class="flow-nodes">
+              <div class="flow-node capstone-node">Your App</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <div class="section-title">Projects you'll ship</div>
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-number">I</div>
+        <div class="project-name">The Quiz App</div>
+        <div class="project-stack">React · Supabase · Auth · Leaderboard</div>
+      </div>
+      <div class="project-card">
+        <div class="project-number">II</div>
+        <div class="project-name">Link-in-Bio</div>
+        <div class="project-stack">React · Supabase · Dynamic profiles</div>
+      </div>
+      <div class="project-card">
+        <div class="project-number">III</div>
+        <div class="project-name">Your Capstone</div>
+        <div class="project-stack">Full-stack · Cloudflare · Deployed</div>
+      </div>
+    </div>
+
+    <!-- STACK -->
+    <div class="section-title">The stack</div>
+    <div class="stack-row">
+      <div class="stack-item">
+        <span class="stack-icon">⚛</span>
+        <span class="stack-name">React 18</span>
+        <span class="stack-role">UI framework</span>
+      </div>
+      <div class="stack-item">
+        <span class="stack-icon">⚡</span>
+        <span class="stack-name">Vite</span>
+        <span class="stack-role">Build tool</span>
+      </div>
+      <div class="stack-item">
+        <span class="stack-icon">🗄</span>
+        <span class="stack-name">Supabase</span>
+        <span class="stack-role">Database + auth</span>
+      </div>
+      <div class="stack-item">
+        <span class="stack-icon">☁</span>
+        <span class="stack-name">Cloudflare</span>
+        <span class="stack-role">Hosting + edge</span>
+      </div>
+      <div class="stack-item">
+        <span class="stack-icon">🤖</span>
+        <span class="stack-name">AI tools</span>
+        <span class="stack-role">Your pair programmer</span>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <span>VIBE:ADVANCED — personal course tracker</span>
+      <span>Built by vibe coding, for vibe coding</span>
+    </footer>
+
+  </div>
+
+  <script>
+    // Progress tracking via localStorage
+    const TOTAL = 8;
+    const state = JSON.parse(localStorage.getItem('vibe-progress') || '{}');
+
+    function updateProgress() {
+      const done = Object.values(state).filter(Boolean).length;
+      const pct = Math.round((done / TOTAL) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = `${done} of ${TOTAL} modules complete`;
+      document.getElementById('progressPct').textContent = pct + '%';
+    }
+
+    function renderDots() {
+      for (let i = 1; i <= TOTAL; i++) {
+        const dot = document.getElementById('dot-' + i);
+        if (!dot) continue;
+        dot.className = 'status-dot';
+        if (state[i]) {
+          dot.classList.add('done');
+        } else if (i === getNextModule()) {
+          dot.classList.add('active');
+        }
+      }
+    }
+
+    function getNextModule() {
+      for (let i = 1; i <= TOTAL; i++) {
+        if (!state[i]) return i;
+      }
+      return TOTAL;
+    }
+
+    function markActive(n) {
+      if (n > TOTAL) return;
+      // Toggle done on double-click concept: click marks done
+      if (state[n]) {
+        delete state[n];
+      } else {
+        state[n] = true;
+      }
+      localStorage.setItem('vibe-progress', JSON.stringify(state));
+      updateProgress();
+      renderDots();
+    }
+
+    // Init
+    setTimeout(() => {
+      updateProgress();
+      renderDots();
+    }, 400);
+  </script>
+</body>
+</html>
