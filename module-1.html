@@ -560,6 +560,36 @@
       .hero-meta { gap: 16px; }
       .challenge-card { padding: 24px 20px; }
     }
+
+    /* ─── DARK MODE ─── */
+    [data-theme="dark"] {
+      --ink: #f0ece0;
+      --paper: #1e1c18;
+      --paper2: #252320;
+      --rule: #3a3730;
+      --faint: #5a5650;
+      --muted: #8a857e;
+    }
+
+    [data-theme="dark"] .code-block { background: #141210; color: #e8e4dc; }
+    [data-theme="dark"] .callout { background: rgba(200,75,47,0.07); }
+    [data-theme="dark"] .conversion-teaser { background: #141210; }
+    [data-theme="dark"] .conversion-teaser p { color: rgba(240,236,224,0.5); }
+
+    /* Toggle button */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--rule);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--faint);
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--ink); color: var(--ink); }
   </style>
 </head>
 <body>
@@ -574,6 +604,7 @@
       <a href="#">02 Prompting</a>
       <a href="#">03 Supabase</a>
     </nav>
+    <button class="theme-toggle" id="themeToggle">☽ dark</button>
   </header>
 
   <!-- HERO -->
@@ -1050,6 +1081,21 @@ Here is the HTML:
     prog[1] = false;
     localStorage.setItem('vibe-progress', JSON.stringify(prog));
   }
+
+  // Dark mode toggle
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('vibe-theme');
+  if (savedTheme === 'dark') {
+    root.setAttribute('data-theme', 'dark');
+    themeBtn.textContent = '☀ light';
+  }
+  themeBtn.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('vibe-theme', isDark ? 'light' : 'dark');
+    themeBtn.textContent = isDark ? '☽ dark' : '☀ light';
+  });
 </script>
 </body>
 </html>

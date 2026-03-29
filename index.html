@@ -503,6 +503,39 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ─── DARK MODE ─── */
+    [data-theme="dark"] {
+      --ink: #f0ece0;
+      --paper: #1e1c18;
+      --paper2: #252320;
+      --rule: #3a3730;
+      --faint: #5a5650;
+    }
+
+    [data-theme="dark"] .hero-sub { color: #8a857e; }
+    [data-theme="dark"] .module-desc { color: #8a857e; }
+    [data-theme="dark"] .progress-section { background: rgba(30,28,24,0.85); }
+    [data-theme="dark"] .flow-diagram { background: rgba(30,28,24,0.7); }
+    [data-theme="dark"] .module-card.capstone { background: #2a2824; border-color: #3a3730; }
+    [data-theme="dark"] .module-card.capstone .module-title { color: var(--paper); }
+    [data-theme="dark"] .module-card.capstone .module-desc { color: rgba(240,236,224,0.45); }
+    [data-theme="dark"] .flow-node.capstone-node { background: #2a2824; color: var(--paper); border-color: #3a3730; }
+
+    /* Toggle button */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--rule);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--faint);
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { border-color: var(--ink); color: var(--ink); }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 640px) {
       .modules-grid { grid-template-columns: 1fr; }
@@ -523,6 +556,7 @@
         Personal learning journal<br>
         Est. 2025 — ongoing
       </div>
+      <button class="theme-toggle" id="themeToggle">☽ dark</button>
     </header>
 
     <!-- HERO -->
@@ -827,6 +861,21 @@
       updateProgress();
       renderDots();
     }, 400);
+
+    // Dark mode toggle
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('vibe-theme');
+    if (savedTheme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      themeBtn.textContent = '☀ light';
+    }
+    themeBtn.addEventListener('click', () => {
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('vibe-theme', isDark ? 'light' : 'dark');
+      themeBtn.textContent = isDark ? '☽ dark' : '☀ light';
+    });
   </script>
 </body>
 </html>

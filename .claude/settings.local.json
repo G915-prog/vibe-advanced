@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"c:/Users/JB/Documents/Claude training\" rev-parse --show-toplevel)",
+      "Bash(git -C \"c:/Users/JB/Documents/Claude training\" ls-files)"
+    ]
+  }
+}
