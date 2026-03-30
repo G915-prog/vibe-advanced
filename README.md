@@ -5,6 +5,10 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-30 — Fix Vercel build (Permission denied)
+- Added `.gitignore` to exclude `node_modules/`, `dist/`, and `.env` files
+- Removed `node_modules` from git tracking (`git rm --cached`) — it was committed from Windows, stripping Linux execute permissions from the vite binary
+
 ### 2026-03-30 — Converted to Vite + React app
 - Scaffolded full Vite + React project (`package.json`, `vite.config.js`, `src/`)
 - Set up React Router v6 — `/` for Home, `/module-1` for Module 1
