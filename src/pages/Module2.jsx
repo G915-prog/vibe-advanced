@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Header from '../components/Header';
 
 // ── Quiz data ──────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -294,25 +295,7 @@ export default function Module2() {
 
       <div style={{ position: 'relative', zIndex: 1, maxWidth: 980, margin: '0 auto', padding: '0 32px' }}>
 
-        {/* HEADER */}
-        <header style={{ borderBottom: '2px solid var(--ink)', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/" style={{ fontFamily: 'var(--display)', fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--ink)' }}>
-            <span style={{ color: 'var(--accent)' }}>VIBE</span>:ADVANCED
-          </Link>
-          <nav style={{ display: 'flex', gap: 24 }}>
-            {[
-              { label: 'Home', to: '/' },
-              { label: '01 React', to: '/module/1' },
-              { label: '02 Prompting', to: '/module/2' },
-              { label: '03 Supabase', to: '#' },
-            ].map((item, i) => (
-              <Link key={i} to={item.to}
-                style={{ fontSize: 11, letterSpacing: '0.1em', color: i === 2 ? 'var(--accent)' : 'var(--muted)', textDecoration: 'none', textTransform: 'uppercase' }}>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </header>
+        <Header variant="module" />
 
         {/* HERO */}
         <div style={{ padding: '64px 0 48px', borderBottom: '1px solid var(--rule)', marginBottom: 64 }}>
@@ -723,7 +706,7 @@ function Callout({ children }) {
 
 function CodeBlock({ lang, children }) {
   return (
-    <div style={{ background: 'var(--ink)', color: '#e8e4dc', borderRadius: 2, padding: '24px 28px', fontSize: 12, lineHeight: 1.8, margin: '20px 0 28px', overflowX: 'auto', position: 'relative', fontFamily: 'var(--mono)' }}>
+    <div style={{ background: '#141210', color: '#e8e4dc', borderRadius: 2, padding: '24px 28px', fontSize: 12, lineHeight: 1.8, margin: '20px 0 28px', overflowX: 'auto', position: 'relative', fontFamily: 'var(--mono)' }}>
       <span style={{ position: 'absolute', top: 10, right: 14, fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4a4640' }}>{lang}</span>
       <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{children}</pre>
     </div>

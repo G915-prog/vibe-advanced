@@ -5,6 +5,10 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-31 — Module 2 theme fixes
+- Replaced Module 2's custom inline header with the shared `Header` component — adds dark/light toggle
+- Fixed `CodeBlock` background from `var(--ink)` to `#141210` (always dark) — was white-on-white in light mode
+
 ### 2026-03-31 — Navigation and progress fixes
 - Linked module 2 card on homepage to `/module/2`
 - Fixed progress tracking — modules only mark done once, never toggle back; empty modules (`#`) don't affect progress
