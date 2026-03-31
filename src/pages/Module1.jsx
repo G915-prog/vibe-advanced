@@ -1,43 +1,10 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
 import Header from '../components/Header'
+import CodeBlock from '../components/CodeBlock'
+import PromptCard from '../components/PromptCard'
+import Quiz from '../components/Quiz'
+import ModuleNav from '../components/ModuleNav'
 
-// ─── Code block helper (preserves syntax-highlighted HTML) ───
-function CodeBlock({ lang, html }) {
-  return (
-    <div className="code-block">
-      <span className="lang-tag">{lang}</span>
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-    </div>
-  )
-}
-
-// ─── Prompt card with copy button ───
-function PromptCard({ label, text }) {
-  const [copied, setCopied] = useState(false)
-
-  function copy() {
-    navigator.clipboard.writeText(text.trim()).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }
-
-  return (
-    <div className="prompt-card">
-      <div className="prompt-header">
-        <span className="prompt-label">{label}</span>
-        <button className={`copy-btn${copied ? ' copied' : ''}`} onClick={copy}>
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
-      </div>
-      <div className="prompt-body">{text}</div>
-    </div>
-  )
-}
-
-// ─── Quiz ───
-const CORRECT = { q1: 'b', q2: 'b', q3: 'c', q4: 'b', q5: 'c' }
 const SCORE_MSGS = [
   'Keep going — re-read the sections where you got tripped up and try rephrasing those concepts in your own words.',
   'Solid foundation. Review the questions you missed, then move on to the mini-challenge.',
@@ -48,7 +15,7 @@ const SCORE_MSGS = [
 
 const QUESTIONS = [
   {
-    id: 'q1', num: '01', total: '05',
+    id: 'q1', num: '01', total: '05', correctKey: 'b',
     text: 'What is the main reason to use React over plain HTML for a dynamic app?',
     options: [
       { key: 'a', text: 'React loads faster than plain HTML in all cases' },
@@ -59,7 +26,7 @@ const QUESTIONS = [
     explanation: '<strong>Correct — B.</strong> React\'s core value is its declarative model: you describe what the UI should look like for any given state, and React figures out the minimal DOM updates needed. This makes complex, dynamic UIs far easier to reason about than manual DOM manipulation.',
   },
   {
-    id: 'q2', num: '02', total: '05',
+    id: 'q2', num: '02', total: '05', correctKey: 'b',
     text: 'In JSX, how do you write a CSS class on an element?',
     options: [
       { key: 'a', text: null, html: '<code>class="my-class"</code>' },
@@ -70,7 +37,7 @@ const QUESTIONS = [
     explanation: '<strong>Correct — B.</strong> JSX is JavaScript, and <code>class</code> is a reserved keyword in JS. React uses <code>className</code> instead. Similarly, <code>for</code> becomes <code>htmlFor</code> on label elements.',
   },
   {
-    id: 'q3', num: '03', total: '05',
+    id: 'q3', num: '03', total: '05', correctKey: 'c',
     text: 'What does useState return?',
     options: [
       { key: 'a', text: 'A single value that updates automatically' },
@@ -81,7 +48,7 @@ const QUESTIONS = [
     explanation: '<strong>Correct — C.</strong> <code>const [count, setCount] = useState(0)</code> — the array destructuring pattern gives you the current value and a setter. Calling the setter triggers a re-render with the new value.',
   },
   {
-    id: 'q4', num: '04', total: '05',
+    id: 'q4', num: '04', total: '05', correctKey: 'b',
     text: 'When should you use useEffect with an empty dependency array []?',
     options: [
       { key: 'a', text: 'When you want the effect to run after every render' },
@@ -92,7 +59,7 @@ const QUESTIONS = [
     explanation: '<strong>Correct — B.</strong> An empty <code>[]</code> tells React "this effect has no dependencies, so only run it once when the component mounts." This is the standard pattern for initial data fetching.',
   },
   {
-    id: 'q5', num: '05', total: '05',
+    id: 'q5', num: '05', total: '05', correctKey: 'c',
     text: 'What is the correct way to pass a value from a parent component to a child?',
     options: [
       { key: 'a', text: 'Store it in localStorage and read it in the child' },
@@ -103,84 +70,6 @@ const QUESTIONS = [
     explanation: '<strong>Correct — C.</strong> Props are React\'s way of passing data down the component tree. <code>&lt;Child value={myValue} /&gt;</code> — the child receives it as <code>function Child({ value })</code>. Data flows one way: parent → child.',
   },
 ]
-
-function Quiz() {
-  const [answers, setAnswers] = useState({})  // { q1: 'b', ... }
-
-  function answer(qid, chosen) {
-    if (answers[qid] !== undefined) return
-    setAnswers(prev => ({ ...prev, [qid]: chosen }))
-  }
-
-  const answered = Object.keys(answers)
-  const allDone = answered.length === QUESTIONS.length
-  const score = answered.filter(qid => answers[qid] === CORRECT[qid]).length
-
-  return (
-    <div className="quiz-section">
-      <div className="section-label">Knowledge check</div>
-      <h2 style={{ fontFamily: 'var(--serif)', fontSize: 32, marginBottom: 12 }}>
-        React Foundations <em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Quiz</em>
-      </h2>
-      <p className="quiz-intro">
-        Five questions. Click an option to answer — you'll see the explanation immediately. No pressure, this is just for you.
-      </p>
-
-      {QUESTIONS.map(q => {
-        const chosen = answers[q.id]
-        const isAnswered = chosen !== undefined
-
-        return (
-          <div key={q.id} className="quiz-q">
-            <div className="quiz-q-header">
-              <div className="quiz-q-num">Question {q.num} / {q.total}</div>
-              {q.text}
-            </div>
-            <div className="options">
-              {q.options.map(opt => {
-                let cls = 'option'
-                if (isAnswered) {
-                  cls += ' disabled'
-                  if (opt.key === CORRECT[q.id]) cls += ' correct'
-                  else if (opt.key === chosen) cls += ' wrong'
-                }
-                return (
-                  <div
-                    key={opt.key}
-                    className={cls}
-                    onClick={() => answer(q.id, opt.key)}
-                  >
-                    <span className="opt-key">{opt.key.toUpperCase()}</span>
-                    {opt.html
-                      ? <span dangerouslySetInnerHTML={{ __html: opt.html }} />
-                      : <span>{opt.text}</span>
-                    }
-                  </div>
-                )
-              })}
-            </div>
-            {isAnswered && (
-              <div
-                className="quiz-explanation"
-                dangerouslySetInnerHTML={{ __html: q.explanation }}
-              />
-            )}
-          </div>
-        )
-      })}
-
-      {allDone && (
-        <div className="quiz-score-bar">
-          <div>
-            <div className="score-num">{score}/{QUESTIONS.length}</div>
-            <div className="score-label">your score</div>
-          </div>
-          <div className="score-msg">{SCORE_MSGS[score] || SCORE_MSGS[4]}</div>
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ─── Code content strings ───
 const CODE_VITE = `<span class="cm"># Scaffold a new React app with Vite</span>
@@ -392,7 +281,7 @@ Here is the HTML:
       </div>
 
       {/* QUIZ */}
-      <Quiz />
+      <Quiz title="React Foundations" questions={QUESTIONS} scoreMessages={SCORE_MSGS} />
 
       {/* MINI CHALLENGE */}
       <div className="challenge-section">
@@ -428,10 +317,7 @@ Here is the HTML:
       </div>
 
       {/* MODULE NAV */}
-      <div className="module-nav">
-        <Link to="/" className="nav-btn">← Back to course</Link>
-        <Link to="/module/2" className="nav-btn next">02 Advanced Prompting →</Link>
-      </div>
+      <ModuleNav prev={{ to: '/', label: 'Back to course' }} next={{ to: '/module/2', label: '02 Advanced Prompting' }} />
     </div>
   )
 }

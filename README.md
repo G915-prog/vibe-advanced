@@ -5,6 +5,15 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-31 — Component extraction
+- Extracted 6 shared components into `src/components/`: `CodeBlock`, `ModuleNav`, `Quiz`, `ModuleCard`, `PromptCard`, `ExerciseCard`
+- `CodeBlock` unified from two different implementations (Module1 used CSS classes + `dangerouslySetInnerHTML`, Module2 used inline styles + `children`) — now supports both via `html` and `children` props
+- `Quiz` unified with normalised question format — Module2's QUIZ data converted to match; `correctKey` added inline to Module1's questions
+- `ModuleNav` replaces inline prev/next nav in both module pages
+- `ModuleCard` extracted from Home's modules grid
+- `PromptCard` and `ExerciseCard` moved from page-local functions to shared components
+- Removed all duplicate local function definitions from Module1, Module2, and Home
+
 ### 2026-03-31 — Module 2 theme fixes
 - Replaced Module 2's custom inline header with the shared `Header` component — adds dark/light toggle
 - Fixed `CodeBlock` background from `var(--ink)` to `#141210` (always dark) — was white-on-white in light mode

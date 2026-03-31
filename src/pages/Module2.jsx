@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Header from '../components/Header';
+import CodeBlock from '../components/CodeBlock';
+import PromptCard from '../components/PromptCard';
+import Quiz from '../components/Quiz';
+import ExerciseCard from '../components/ExerciseCard';
+import ModuleNav from '../components/ModuleNav';
 
 // ── Quiz data ──────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -233,47 +237,37 @@ const EXERCISES = [
   }
 ];
 
+// ── Normalised quiz data for shared Quiz component ─────────────────────────
+const QUIZ_QUESTIONS = QUIZ.map((q, i) => ({
+  id: `q${i + 1}`,
+  num: String(i + 1).padStart(2, '0'),
+  total: String(QUIZ.length).padStart(2, '0'),
+  text: q.q,
+  options: q.opts.map((text, j) => ({ key: String.fromCharCode(97 + j), text })),
+  correctKey: String.fromCharCode(97 + q.correct),
+  explanation: q.exp,
+}))
+
+const SCORE_MSGS = [
+  "Review the lessons again — focus on the techniques you got wrong.",
+  "Getting there. Re-read the sections on the questions you missed.",
+  "Solid. You understand the core concepts. Now the exercises will cement them.",
+  "Strong grasp. You're ready to use these techniques on real problems.",
+  "Perfect. Go build something hard.",
+]
+
 // ── Component ──────────────────────────────────────────────────────────────
 export default function Module2() {
-  const [quizAnswers, setQuizAnswers] = useState({});
-  const [quizDone, setQuizDone] = useState(false);
-  const [copied, setCopied] = useState(null);
   const [completedEx, setCompletedEx] = useState(() =>
     JSON.parse(localStorage.getItem('vibe-m2-ex') || '{}')
   );
   const [activeLesson, setActiveLesson] = useState(1);
-
-  function handleAnswer(qIdx, optIdx) {
-    if (quizAnswers[qIdx] !== undefined) return;
-    const next = { ...quizAnswers, [qIdx]: optIdx };
-    setQuizAnswers(next);
-    if (Object.keys(next).length === QUIZ.length) setQuizDone(true);
-  }
-
-  function copyPrompt(idx, text) {
-    navigator.clipboard.writeText(text.trim()).then(() => {
-      setCopied(idx);
-      setTimeout(() => setCopied(null), 2000);
-    });
-  }
 
   function toggleExercise(id) {
     const next = { ...completedEx, [id]: !completedEx[id] };
     setCompletedEx(next);
     localStorage.setItem('vibe-m2-ex', JSON.stringify(next));
   }
-
-  const score = Object.entries(quizAnswers).filter(
-    ([i, a]) => a === QUIZ[i].correct
-  ).length;
-
-  const scoreMsg = [
-    "Review the lessons again — focus on the techniques you got wrong.",
-    "Getting there. Re-read the sections on the questions you missed.",
-    "Solid. You understand the core concepts. Now the exercises will cement them.",
-    "Strong grasp. You're ready to use these techniques on real problems.",
-    "Perfect. Go build something hard."
-  ][score] || "";
 
   const lessonTitles = [
     "Prompt chaining",
@@ -515,98 +509,12 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
             All six prompts from across this module, in one place.
           </p>
           {PROMPTS.map((p, i) => (
-            <div key={i} style={{ border: '1px solid var(--rule)', marginBottom: 12, overflow: 'hidden' }}>
-              <div style={{ background: 'var(--paper2)', borderBottom: '1px solid var(--rule)', padding: '10px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <span style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--muted)' }}>{p.label}</span>
-                  <span style={{ fontSize: 9, padding: '2px 7px', border: '1px solid var(--rule)', color: 'var(--faint)', letterSpacing: '0.1em' }}>{p.technique}</span>
-                </div>
-                <button onClick={() => copyPrompt(i, p.text)}
-                  style={{
-                    fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase',
-                    background: copied === i ? 'var(--green)' : 'none',
-                    border: `1px solid ${copied === i ? 'var(--green)' : 'var(--rule)'}`,
-                    padding: '4px 10px', cursor: 'pointer',
-                    color: copied === i ? 'white' : 'var(--muted)', transition: 'all 0.15s'
-                  }}>
-                  {copied === i ? 'Copied!' : 'Copy'}
-                </button>
-              </div>
-              <pre style={{ padding: '18px 20px', fontSize: 12, lineHeight: 1.8, color: 'var(--ink)', whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'var(--mono)' }}>
-                {p.text}
-              </pre>
-            </div>
+            <PromptCard key={i} label={p.label} text={p.text} tag={p.technique} />
           ))}
         </div>
 
         {/* QUIZ */}
-        <div style={{ marginBottom: 72 }}>
-          <SectionLabel text="Knowledge check" />
-          <h2 style={{ fontFamily: 'var(--serif)', fontSize: 32, marginBottom: 12 }}>
-            Prompting <em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Quiz</em>
-          </h2>
-          <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 32, lineHeight: 1.7 }}>Five questions. Click to answer — explanations appear immediately.</p>
-
-          {QUIZ.map((q, qi) => {
-            const chosen = quizAnswers[qi];
-            const answered = chosen !== undefined;
-            return (
-              <div key={qi} style={{ border: '1px solid var(--rule)', marginBottom: 16, overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--rule)', background: 'var(--paper2)' }}>
-                  <div style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 6 }}>
-                    Question {String(qi + 1).padStart(2, '0')} / 05
-                  </div>
-                  <div style={{ fontSize: 13, lineHeight: 1.6 }}>{q.q}</div>
-                </div>
-                <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {q.opts.map((opt, oi) => {
-                    let bg = 'var(--paper)', borderColor = 'var(--rule)', color = 'var(--ink)';
-                    if (answered) {
-                      if (oi === q.correct) { bg = 'rgba(45,106,79,0.06)'; borderColor = 'var(--green)'; color = 'var(--green)'; }
-                      else if (oi === chosen) { bg = 'rgba(200,75,47,0.06)'; borderColor = 'var(--accent)'; color = 'var(--accent)'; }
-                    }
-                    return (
-                      <div key={oi} onClick={() => handleAnswer(qi, oi)}
-                        style={{
-                          display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 14px',
-                          border: `1px solid ${borderColor}`, cursor: answered ? 'default' : 'pointer',
-                          fontSize: 12, lineHeight: 1.5, transition: 'all 0.15s', background: bg, color
-                        }}>
-                        <span style={{
-                          fontSize: 10, width: 18, height: 18, border: `1px solid ${borderColor}`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                          background: answered && (oi === q.correct || oi === chosen) ? borderColor : 'transparent',
-                          color: answered && (oi === q.correct || oi === chosen) ? 'white' : 'inherit'
-                        }}>
-                          {['A','B','C','D'][oi]}
-                        </span>
-                        {opt}
-                      </div>
-                    );
-                  })}
-                </div>
-                {answered && (
-                  <div style={{ padding: '12px 20px', borderTop: '1px solid var(--rule)', fontSize: 11, lineHeight: 1.7, color: 'var(--muted)', background: 'var(--paper2)' }}>
-                    <strong style={{ color: 'var(--ink)' }}>
-                      {chosen === q.correct ? '✓ Correct — ' : '✗ Not quite — '}
-                    </strong>
-                    {q.exp}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {quizDone && (
-            <div style={{ border: '1px solid var(--rule)', padding: '24px 28px', display: 'flex', alignItems: 'center', gap: 32, flexWrap: 'wrap' }}>
-              <div>
-                <div style={{ fontFamily: 'var(--serif)', fontSize: 48, lineHeight: 1 }}>{score}/5</div>
-                <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>your score</div>
-              </div>
-              <div style={{ fontSize: 13, lineHeight: 1.6, color: 'var(--muted)', maxWidth: 440 }}>{scoreMsg}</div>
-            </div>
-          )}
-        </div>
+        <Quiz title="Prompting" questions={QUIZ_QUESTIONS} scoreMessages={SCORE_MSGS} />
 
         {/* CAPSTONE */}
         <div style={{ marginBottom: 72 }}>
@@ -660,10 +568,7 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
         </div>
 
         {/* NAV */}
-        <div style={{ borderTop: '1px solid var(--rule)', padding: '28px 0 48px', display: 'flex', justifyContent: 'space-between' }}>
-          <Link to="/module/1" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--muted)' }}>← 01 React Foundations</Link>
-          <Link to="#" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--accent)' }}>03 Supabase →</Link>
-        </div>
+        <ModuleNav prev={{ to: '/module/1', label: '01 React Foundations' }} next={{ to: '#', label: '03 Supabase' }} />
 
       </div>
     </div>
@@ -704,57 +609,3 @@ function Callout({ children }) {
   );
 }
 
-function CodeBlock({ lang, children }) {
-  return (
-    <div style={{ background: '#141210', color: '#e8e4dc', borderRadius: 2, padding: '24px 28px', fontSize: 12, lineHeight: 1.8, margin: '20px 0 28px', overflowX: 'auto', position: 'relative', fontFamily: 'var(--mono)' }}>
-      <span style={{ position: 'absolute', top: 10, right: 14, fontSize: 9, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#4a4640' }}>{lang}</span>
-      <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{children}</pre>
-    </div>
-  );
-}
-
-function ExerciseCard({ ex, completed, onToggle }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ border: `1px solid ${completed ? 'var(--green)' : 'var(--rule)'}`, marginTop: 32, overflow: 'hidden', transition: 'border-color 0.2s' }}>
-      <div onClick={() => setOpen(o => !o)}
-        style={{ padding: '16px 20px', background: 'var(--paper2)', borderBottom: open ? '1px solid var(--rule)' : 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: completed ? 'var(--green)' : 'var(--accent)' }}>
-            {completed ? '✓ Done' : 'Exercise'}
-          </span>
-          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>{ex.title}</span>
-        </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span style={{ fontSize: 11, color: 'var(--faint)' }}>{ex.duration}</span>
-          <span style={{ fontSize: 14, color: 'var(--muted)', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none' }}>↓</span>
-        </div>
-      </div>
-      {open && (
-        <div style={{ padding: '20px 20px 24px' }}>
-          <p style={{ fontSize: 12, lineHeight: 1.8, color: 'var(--muted)', marginBottom: 20 }}>{ex.desc}</p>
-          <ol style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-            {ex.steps.map((s, i) => (
-              <li key={i} style={{ display: 'flex', gap: 14, fontSize: 12, lineHeight: 1.6 }}>
-                <span style={{ flexShrink: 0, width: 20, height: 20, background: 'var(--ink)', color: 'var(--paper)', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i + 1}</span>
-                <span style={{ color: 'var(--muted)', paddingTop: 2 }}>{s}</span>
-              </li>
-            ))}
-          </ol>
-          <div style={{ borderTop: '1px solid var(--rule)', paddingTop: 14, marginBottom: 20 }}>
-            <span style={{ fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--faint)' }}>Reflection: </span>
-            <span style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>{ex.reflection}</span>
-          </div>
-          <button onClick={onToggle}
-            style={{
-              fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase',
-              background: completed ? 'var(--green)' : 'none', border: `1px solid ${completed ? 'var(--green)' : 'var(--rule)'}`,
-              padding: '8px 16px', cursor: 'pointer', color: completed ? 'white' : 'var(--muted)', transition: 'all 0.15s'
-            }}>
-            {completed ? '✓ Mark incomplete' : 'Mark as done'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}

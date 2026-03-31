@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import Header from '../components/Header'
+import ModuleCard from '../components/ModuleCard'
 
 const TOTAL = 8
 
@@ -120,26 +120,12 @@ export default function Home() {
       <div className="section-title">Course modules</div>
       <div className="modules-grid">
         {MODULES.map(mod => (
-          <Link
+          <ModuleCard
             key={mod.id}
-            className="module-card"
-            to={mod.to}
+            mod={mod}
+            dotClass={getDotClass(mod.id, progress)}
             onClick={() => mod.to !== '#' && markActive(mod.id)}
-          >
-            <div className="module-num">
-              {mod.num}
-              <div className={getDotClass(mod.id, progress)} />
-            </div>
-            <div className="module-title">
-              {mod.title.split('\n').map((line, i) => (
-                <span key={i}>{line}{i === 0 && <br />}</span>
-              ))}
-            </div>
-            <div className="module-desc">{mod.desc}</div>
-            <div className="module-tags">
-              {mod.tags.map(t => <span key={t} className="module-tag">{t}</span>)}
-            </div>
-          </Link>
+          />
         ))}
 
         {/* CAPSTONE */}
