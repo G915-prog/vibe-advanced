@@ -6,7 +6,7 @@ const TOTAL = 8
 
 const MODULES = [
   {
-    id: 1, num: '01 — foundations', to: '/module-1',
+    id: 1, num: '01 — foundations', to: '/module/1',
     title: 'React\nFoundations',
     desc: 'JSX, components, hooks, and state — all scaffolded by prompting your AI. Build intuition by building things.',
     tags: ['React 18', 'Vite', 'useState', 'useEffect'],
