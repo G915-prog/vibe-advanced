@@ -5,6 +5,11 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-31 — Added Module 2 and Vercel SPA fix
+- Created `src/pages/Module2.jsx` page component
+- Added `/module/2` route in `App.jsx`
+- Added `vercel.json` with rewrite rule to fix 404 on page reload for all SPA routes
+
 ### 2026-03-31 — React Router cleanup
 - Refactored `App.jsx` to be router-only (`BrowserRouter` + `Routes` + `Route`, nothing else)
 - Moved theme init out of `App.jsx` `useEffect` into a plain script line in `main.jsx`
