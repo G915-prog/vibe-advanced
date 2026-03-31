@@ -5,6 +5,14 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-31 — Navigation and progress fixes
+- Linked module 2 card on homepage to `/module/2`
+- Fixed progress tracking — modules only mark done once, never toggle back; empty modules (`#`) don't affect progress
+- Updated Header navbar: `02 Prompting` now points to `/module/2` with active styling
+- Module 1 bottom nav `→` button now points to `/module/2`
+- Fixed all `<a href>` tags in `Module2.jsx` — converted to `<Link to>`, added `react-router-dom` import
+- `vercel.json` rewrite rule added to fix 404 on page reload for all SPA routes
+
 ### 2026-03-31 — Added Module 2 and Vercel SPA fix
 - Created `src/pages/Module2.jsx` page component
 - Added `/module/2` route in `App.jsx`

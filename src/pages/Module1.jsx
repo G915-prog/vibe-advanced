@@ -430,7 +430,7 @@ Here is the HTML:
       {/* MODULE NAV */}
       <div className="module-nav">
         <Link to="/" className="nav-btn">← Back to course</Link>
-        <Link to="#" className="nav-btn next">02 Advanced Prompting →</Link>
+        <Link to="/module/2" className="nav-btn next">02 Advanced Prompting →</Link>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 // ── Quiz data ──────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -295,15 +296,20 @@ export default function Module2() {
 
         {/* HEADER */}
         <header style={{ borderBottom: '2px solid var(--ink)', padding: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <a href="/" style={{ fontFamily: 'var(--display)', fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--ink)' }}>
+          <Link to="/" style={{ fontFamily: 'var(--display)', fontWeight: 800, fontSize: 13, letterSpacing: '0.18em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--ink)' }}>
             <span style={{ color: 'var(--accent)' }}>VIBE</span>:ADVANCED
-          </a>
+          </Link>
           <nav style={{ display: 'flex', gap: 24 }}>
-            {['Home', '01 React', '02 Prompting', '03 Supabase'].map((l, i) => (
-              <a key={i} href={i === 0 ? '/' : i === 1 ? '/module/1' : '#'}
+            {[
+              { label: 'Home', to: '/' },
+              { label: '01 React', to: '/module/1' },
+              { label: '02 Prompting', to: '/module/2' },
+              { label: '03 Supabase', to: '#' },
+            ].map((item, i) => (
+              <Link key={i} to={item.to}
                 style={{ fontSize: 11, letterSpacing: '0.1em', color: i === 2 ? 'var(--accent)' : 'var(--muted)', textDecoration: 'none', textTransform: 'uppercase' }}>
-                {l}
-              </a>
+                {item.label}
+              </Link>
             ))}
           </nav>
         </header>
@@ -672,8 +678,8 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
 
         {/* NAV */}
         <div style={{ borderTop: '1px solid var(--rule)', padding: '28px 0 48px', display: 'flex', justifyContent: 'space-between' }}>
-          <a href="/module/1" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--muted)' }}>← 01 React Foundations</a>
-          <a href="#" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--accent)' }}>03 Supabase →</a>
+          <Link to="/module/1" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--muted)' }}>← 01 React Foundations</Link>
+          <Link to="#" style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', color: 'var(--accent)' }}>03 Supabase →</Link>
         </div>
 
       </div>

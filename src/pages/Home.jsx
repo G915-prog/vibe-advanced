@@ -12,7 +12,7 @@ const MODULES = [
     tags: ['React 18', 'Vite', 'useState', 'useEffect'],
   },
   {
-    id: 2, num: '02 — technique', to: '#',
+    id: 2, num: '02 — technique', to: '/module/2',
     title: 'Advanced\nPrompting',
     desc: 'Decompose complex problems. Chain prompts. Debug by describing. Turn any error into a lesson.',
     tags: ['Prompt chains', 'Debugging', 'Iteration'],
@@ -82,9 +82,8 @@ export default function Home() {
   function markActive(id) {
     if (id > TOTAL) return
     setProgress(prev => {
-      const next = { ...prev }
-      if (next[id]) delete next[id]
-      else next[id] = true
+      if (prev[id]) return prev
+      const next = { ...prev, [id]: true }
       localStorage.setItem('vibe-progress', JSON.stringify(next))
       return next
     })
@@ -125,7 +124,7 @@ export default function Home() {
             key={mod.id}
             className="module-card"
             to={mod.to}
-            onClick={() => markActive(mod.id)}
+            onClick={() => mod.to !== '#' && markActive(mod.id)}
           >
             <div className="module-num">
               {mod.num}
