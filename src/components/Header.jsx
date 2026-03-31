@@ -16,9 +16,9 @@ export default function Header({ variant = 'module' }) {
       ) : (
         <nav className="nav-links">
           <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/module-1">01 React</NavLink>
-          <a href="#">02 Prompting</a>
-          <a href="#">03 Supabase</a>
+          <NavLink to="/module/1">01 React</NavLink>
+          <Link to="#">02 Prompting</Link>
+          <Link to="#">03 Supabase</Link>
         </nav>
       )}
 

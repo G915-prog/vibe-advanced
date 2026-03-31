@@ -5,6 +5,14 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-03-31 — React Router cleanup
+- Refactored `App.jsx` to be router-only (`BrowserRouter` + `Routes` + `Route`, nothing else)
+- Moved theme init out of `App.jsx` `useEffect` into a plain script line in `main.jsx`
+- Removed `BrowserRouter` from `main.jsx` (now lives in `App.jsx`)
+- Updated module route from `/module-1` to `/module/1`
+- Replaced all remaining `<a href>` tags with React Router `<Link to>` in `Header.jsx` and `Module1.jsx`
+- No page now causes a full browser reload on internal navigation
+
 ### 2026-03-30 — Fix Vercel build (Permission denied)
 - Added `.gitignore` to exclude `node_modules/`, `dist/`, and `.env` files
 - Removed `node_modules` from git tracking (`git rm --cached`) — it was committed from Windows, stripping Linux execute permissions from the vite binary
