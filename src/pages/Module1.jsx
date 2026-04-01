@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import Header from '../components/Header'
+import ComingUp from '../components/ComingUp'
 import { useProgress } from '../hooks/useProgress'
 import CodeBlock from '../components/CodeBlock'
 import PromptCard from '../components/PromptCard'
@@ -313,11 +314,11 @@ Here is the HTML:
       </div>
 
       {/* CONVERSION TEASER */}
-      <div className="conversion-teaser">
-        <div className="teaser-kicker">// coming up — module 1 capstone</div>
-        <h2>Convert this site to React</h2>
-        <p>Once you've shipped the counter app, you'll come back here and convert the entire VIBE:ADVANCED course site from plain HTML files into a proper Vite + React app — with React Router, shared components, and a real project structure. That conversion exercise is Module 1's final boss.</p>
-      </div>
+      <ComingUp
+        kicker="module 1 capstone"
+        title="Convert this site to React"
+        desc="Once you've shipped the counter app, you'll come back here and convert the entire VIBE:ADVANCED course site from plain HTML files into a proper Vite + React app — with React Router, shared components, and a real project structure. That conversion exercise is Module 1's final boss."
+      />
 
       {/* MODULE NAV */}
       <ModuleNav prev={{ to: '/', label: 'Back to course' }} next={{ to: '/module/2', label: '02 Advanced Prompting' }} />

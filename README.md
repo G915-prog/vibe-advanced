@@ -5,6 +5,13 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Extract ComingUp component
+- Created `src/components/ComingUp.jsx` — shared teaser for the next module, used at the bottom of every module page
+- Replaced inline `.conversion-teaser` blocks in Module1 and Module2 with `<ComingUp kicker title desc />`
+
+### 2026-04-01 — Fix Module 2 dark mode white-on-white in teaser
+- "Coming up — Module 3" teaser was using inline styles; swapped to `.conversion-teaser` + `.teaser-kicker` CSS classes which already have correct dark mode overrides
+
 ### 2026-04-01 — Fix hardcoded quiz question count
 - `Quiz.jsx` intro text now uses `{questions.length}` instead of hardcoded "Five questions"
 

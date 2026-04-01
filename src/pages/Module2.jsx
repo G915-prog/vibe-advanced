@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/Header';
+import ComingUp from '../components/ComingUp';
 import { useProgress } from '../hooks/useProgress';
 import CodeBlock from '../components/CodeBlock';
 import PromptCard from '../components/PromptCard';
@@ -561,13 +562,11 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
         </div>
 
         {/* NEXT MODULE TEASER */}
-        <div style={{ border: '1px solid var(--rule)', padding: 32, marginBottom: 64, background: 'var(--ink)', color: 'var(--paper)' }}>
-          <div style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 14 }}>// coming up — module 3</div>
-          <h2 style={{ fontFamily: 'var(--serif)', fontSize: 26, marginBottom: 12 }}>Supabase Database</h2>
-          <p style={{ fontSize: 12, lineHeight: 1.8, color: 'rgba(244,240,232,0.55)', maxWidth: 560 }}>
-            Postgres + Auth + real-time subscriptions — all without writing backend code. You'll connect your React app to a live database and store your course progress in Supabase instead of localStorage.
-          </p>
-        </div>
+        <ComingUp
+          kicker="module 3"
+          title="Supabase Database"
+          desc="Postgres + Auth + real-time subscriptions — all without writing backend code. You'll connect your React app to a live database and store your course progress in Supabase instead of localStorage."
+        />
 
         {/* NAV */}
         <ModuleNav prev={{ to: '/module/1', label: '01 React Foundations' }} next={{ to: '#', label: '03 Supabase' }} />
