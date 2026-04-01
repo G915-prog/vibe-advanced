@@ -569,7 +569,7 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
         />
 
         {/* NAV */}
-        <ModuleNav prev={{ to: '/module/1', label: '01 React Foundations' }} next={{ to: '#', label: '03 Supabase' }} />
+        <ModuleNav prev={{ to: '/module/1', label: '01 React Foundations' }} next={{ to: '/module/3', label: '03 Supabase' }} />
 
       </div>
     </div>
