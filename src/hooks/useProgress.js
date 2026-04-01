@@ -58,15 +58,35 @@ export function useProgress() {
     fetchProgress()
 
     // ─── Realtime subscription ──────────────────────────────────────────────
+    // Updates local state in place instead of re-fetching — avoids a round
+    // trip on every change and keeps the UI snappy across tabs.
     channelRef.current = supabase
       .channel('module_progress_changes')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'module_progress' },
-        () => { fetchProgress() }
+        { event: 'INSERT', schema: 'public', table: 'module_progress' },
+        (payload) => {
+          setRows(prev => [...prev, payload.new])
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'module_progress' },
+        (payload) => {
+          setRows(prev => prev.map(r => r.id === payload.new.id ? payload.new : r))
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'module_progress' },
+        (payload) => {
+          setRows(prev => prev.filter(r => r.id !== payload.old.id))
+        }
       )
       .subscribe()
 
+    // Cleanup — unsubscribe when the component unmounts (or the effect re-runs).
+    // Without this, every mount leaks a WebSocket connection.
     return () => {
       cancelled = true
       if (channelRef.current) {

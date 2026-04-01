@@ -5,6 +5,11 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — useProgress: realtime in-place state updates
+- Replaced re-fetch-on-change realtime callback with in-place state updates for INSERT, UPDATE, DELETE events — no round-trip on each change
+- INSERT appends `payload.new` to rows; UPDATE replaces by `id`; DELETE filters out by `payload.old.id`
+- Cleanup comment added explaining why `removeChannel` is required on unmount
+
 ### 2026-04-01 — Rewrite useProgress to use Supabase
 - `useProgress` now fetches `module_progress` rows from Supabase on mount for the current authenticated user
 - Exposes `data` (raw rows), `loading`, `error` alongside the existing `progress` map — backward-compatible with all current components
