@@ -5,6 +5,10 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Set up Supabase client
+- Installed `@supabase/supabase-js`
+- Created `src/lib/supabase.js` — initialises client from `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` env vars; exports named `supabase` client
+
 ### 2026-04-01 — Fix Header nav: wire 03 Supabase to /module/3
 - `Header.jsx` — `03 Supabase` NavLink changed from `#` to `/module/3`; fixes breadcrumb navigation and active styling on all module pages
 
