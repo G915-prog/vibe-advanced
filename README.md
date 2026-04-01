@@ -5,6 +5,14 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Rewrite useProgress to use Supabase
+- `useProgress` now fetches `module_progress` rows from Supabase on mount for the current authenticated user
+- Exposes `data` (raw rows), `loading`, `error` alongside the existing `progress` map — backward-compatible with all current components
+- `markComplete(moduleNum)` upserts a row (`completed=true`, sets `completed_at`) using the `user_id,module_num` unique constraint
+- `markIncomplete(moduleNum)` updates the row to `completed=false`, clears `completed_at`
+- Exposes low-level `insert`, `update`, `deleteRow` helpers for direct row operations
+- Subscribes to realtime `postgres_changes` on `module_progress` and re-fetches on any change; unsubscribes on unmount via `useEffect` cleanup
+
 ### 2026-04-01 — Set up Supabase client
 - Installed `@supabase/supabase-js`
 - Created `src/lib/supabase.js` — initialises client from `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` env vars; exports named `supabase` client
