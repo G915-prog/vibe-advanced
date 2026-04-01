@@ -26,7 +26,7 @@ const MODULES = [
     tags: ['Supabase', 'Postgres', 'RLS', 'Real-time'],
   },
   {
-    id: 4, num: '04 — integration', to: '#',
+    id: 4, num: '04 — integration', to: '/module/4',
     title: 'API\nIntegration',
     desc: 'REST APIs, fetch(), environment variables, error handling. Pull live data into your app without fear.',
     tags: ['REST', 'fetch()', 'env vars', 'async/await'],

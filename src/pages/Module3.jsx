@@ -603,7 +603,7 @@ export default function Module3() {
       {/* MODULE NAV */}
       <ModuleNav
         prev={{ to: '/module/2', label: '02 Advanced Prompting' }}
-        next={{ to: '#', label: '04 API Integration' }}
+        next={{ to: '/module/4', label: '04 API Integration' }}
       />
     </div>
   )
