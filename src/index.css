@@ -300,7 +300,7 @@ h1 em { font-style: italic; color: var(--accent); }
 .module-card:hover .module-desc { color: var(--faint); }
 .module-card:hover .module-tag { background: rgba(255,255,255,0.08); color: var(--faint); border-color: rgba(255,255,255,0.15); }
 .module-card:hover .status-dot { border-color: var(--faint); }
-.module-card:hover .status-dot.done { background: var(--accent); border-color: var(--accent); }
+.module-card:hover .status-dot.done { background: var(--green); border-color: var(--green); }
 .module-card > * { position: relative; z-index: 1; }
 
 .module-num {
@@ -318,11 +318,11 @@ h1 em { font-style: italic; color: var(--accent); }
 .status-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  border: 1.5px solid var(--rule);
+  border: 1.5px solid var(--accent);
   transition: all 0.18s;
 }
-.status-dot.done { background: var(--gold); border-color: var(--gold); }
-.status-dot.active { background: var(--accent); border-color: var(--accent); animation: pulse 2s ease infinite; }
+.status-dot.done { background: var(--green); border-color: var(--green); }
+.status-dot.active { background: var(--gold); border-color: var(--gold); animation: pulse 2s ease infinite; }
 
 .module-title {
   font-family: var(--serif);
