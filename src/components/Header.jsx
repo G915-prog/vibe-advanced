@@ -1,8 +1,10 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
+import { useAuth } from '../context/AuthContext'
 
 export default function Header({ variant = 'home' }) {
   const { isDark, toggle } = useTheme()
+  const { user, signOut } = useAuth()
 
   return (
     <header>
@@ -22,9 +24,16 @@ export default function Header({ variant = 'home' }) {
         </nav>
       )}
 
-      <button className="theme-toggle" onClick={toggle}>
-        {isDark ? '☀ light' : '☽ dark'}
-      </button>
+      <div className="header-actions">
+        {user ? (
+          <button className="auth-btn" onClick={signOut}>Sign out</button>
+        ) : (
+          <Link to="/login" className="auth-btn">Sign in</Link>
+        )}
+        <button className="theme-toggle" onClick={toggle}>
+          {isDark ? '☀ light' : '☽ dark'}
+        </button>
+      </div>
     </header>
   )
 }

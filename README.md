@@ -5,6 +5,14 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Add Supabase Auth
+- Created `src/context/AuthContext.jsx` — `AuthProvider` wraps the app; `useAuth()` hook exposes `user`, `loading`, `signUp`, `signIn`, `signOut`; uses `getSession()` on mount + `onAuthStateChange` to stay in sync
+- Created `src/components/ProtectedRoute.jsx` — renders `null` while loading (no flash), redirects to `/login` with `replace` if no session
+- Created `src/pages/Login.jsx` — email/password form with separate Sign in / Create account buttons; shows inline error and success messages; matches existing design system
+- `App.jsx` — wrapped with `AuthProvider`; added `/login` route; module routes (`/module/1–3`) wrapped with `ProtectedRoute`
+- `Header.jsx` — added `useAuth`; shows "Sign out" button when authenticated, "Sign in" link when not; wrapped in `.header-actions` flex container
+- `index.css` — added `.header-actions`, `.auth-btn`, `.login-page`, `.login-form`, `.form-field`, `.form-input`, `.btn-primary`, `.btn-secondary`, `.auth-error`, `.auth-message` CSS blocks; dark mode override for `.form-input`
+
 ### 2026-04-01 — useProgress: realtime in-place state updates
 - Replaced re-fetch-on-change realtime callback with in-place state updates for INSERT, UPDATE, DELETE events — no round-trip on each change
 - INSERT appends `payload.new` to rows; UPDATE replaces by `id`; DELETE filters out by `payload.old.id`
