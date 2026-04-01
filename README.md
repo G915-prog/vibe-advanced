@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Fix Header nav: wire 03 Supabase to /module/3
+- `Header.jsx` — `03 Supabase` NavLink changed from `#` to `/module/3`; fixes breadcrumb navigation and active styling on all module pages
+
 ### 2026-04-01 — Module 3: merge parallel lesson arrays into single LESSONS array
 - Merged `LESSON_TITLES`, `LESSON_CONTENT`, and `EXERCISES` into a single `LESSONS` array — each object now owns its `title`, content fields, and `exercise` together, making it impossible to desync them by reordering
 - Removed the now-redundant standalone `EXERCISES` array
