@@ -4,7 +4,6 @@ import Module1 from './pages/Module1'
 import Module2 from './pages/Module2';
 import Module3 from './pages/Module3';
 
-
 export default function App() {
   return (
     <BrowserRouter>
