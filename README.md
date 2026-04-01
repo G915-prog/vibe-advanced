@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Remove window.supabase debug leak
+- Removed `window.supabase = supabase` from `src/lib/supabase.js` — debug line that exposed the Supabase client on the global object, allowing anyone with DevTools access to query the database directly
+
 ### 2026-04-01 — Add Supabase Auth
 - Created `src/context/AuthContext.jsx` — `AuthProvider` wraps the app; `useAuth()` hook exposes `user`, `loading`, `signUp`, `signIn`, `signOut`; uses `getSession()` on mount + `onAuthStateChange` to stay in sync
 - Created `src/components/ProtectedRoute.jsx` — renders `null` while loading (no flash), redirects to `/login` with `replace` if no session
