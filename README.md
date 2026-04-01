@@ -5,6 +5,15 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Progress ring + completion tracking
+- Created `src/hooks/useProgress.js` — shared hook for reading/writing `vibe-progress` to localStorage; replaces inline state in `Home.jsx`
+- Created `src/components/ProgressRing.jsx` — animated SVG ring with accent-to-accent2 gradient, percentage and module count in center
+- `Home.jsx` — replaced progress bar with `ProgressRing` in hero; hero layout updated to flex row (text left, ring right); `markActive` removed (completion now fires from quiz)
+- `Quiz.jsx` — added optional `onComplete` callback prop; fires via `useEffect` when all questions are answered
+- `Module1.jsx` and `Module2.jsx` — import `useProgress`, pass `onComplete={() => markComplete(id)}` to `Quiz`
+- Progress now reflects actual module completion (quiz finished) rather than card click
+- Responsive: hero stacks vertically on mobile, ring centres below text
+
 ### 2026-04-01 — Bug fixes: ExerciseCard styling + Fragment key warning
 - Rewrote `ExerciseCard` to use CSS classes instead of 40+ inline styles — consistent with every other component
 - Added `.exercise-card`, `.exercise-header`, `.exercise-status`, `.exercise-arrow`, `.exercise-done-btn` (and modifier classes `.completed`, `.open`) to `index.css`

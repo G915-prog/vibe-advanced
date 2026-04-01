@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-export default function Quiz({ title, questions, scoreMessages }) {
+export default function Quiz({ title, questions, scoreMessages, onComplete }) {
   const [answers, setAnswers] = useState({})
 
   function answer(qid, chosen) {
@@ -11,6 +11,10 @@ export default function Quiz({ title, questions, scoreMessages }) {
   const answered = Object.keys(answers)
   const allDone = answered.length === questions.length
   const score = answered.filter(qid => answers[qid] === questions.find(q => q.id === qid)?.correctKey).length
+
+  useEffect(() => {
+    if (allDone) onComplete?.()
+  }, [allDone])
 
   return (
     <div className="quiz-section">

@@ -1,6 +1,8 @@
 import { useState, useEffect, Fragment } from 'react'
 import Header from '../components/Header'
 import ModuleCard from '../components/ModuleCard'
+import ProgressRing from '../components/ProgressRing'
+import { useProgress } from '../hooks/useProgress'
 
 const TOTAL = 8
 
@@ -66,28 +68,16 @@ function getDotClass(id, progress) {
 }
 
 export default function Home() {
-  const [progress, setProgress] = useState(
-    () => JSON.parse(localStorage.getItem('vibe-progress') || '{}')
-  )
-  const [barWidth, setBarWidth] = useState(0)
+  const { progress } = useProgress()
+  const [animatedPct, setAnimatedPct] = useState(0)
 
   const done = Object.values(progress).filter(Boolean).length
   const pct = Math.round((done / TOTAL) * 100)
 
   useEffect(() => {
-    const t = setTimeout(() => setBarWidth(pct), 400)
+    const t = setTimeout(() => setAnimatedPct(pct), 400)
     return () => clearTimeout(t)
   }, [pct])
-
-  function markActive(id) {
-    if (id > TOTAL) return
-    setProgress(prev => {
-      if (prev[id]) return prev
-      const next = { ...prev, [id]: true }
-      localStorage.setItem('vibe-progress', JSON.stringify(next))
-      return next
-    })
-  }
 
   return (
     <div className="wrap">
@@ -95,26 +85,17 @@ export default function Home() {
 
       {/* HERO */}
       <section className="hero">
-        <div className="hero-kicker">Advanced full-stack course</div>
-        <h1>Build real<br />things with <em>AI.</em></h1>
-        <p className="hero-sub">
-          You already know the vibe. Now ship production apps —
-          React, Supabase, Cloudflare. Eight modules. Three projects.
-          One capstone. All built by prompting your way through it.
-        </p>
+        <div className="hero-content">
+          <div className="hero-kicker">Advanced full-stack course</div>
+          <h1>Build real<br />things with <em>AI.</em></h1>
+          <p className="hero-sub">
+            You already know the vibe. Now ship production apps —
+            React, Supabase, Cloudflare. Eight modules. Three projects.
+            One capstone. All built by prompting your way through it.
+          </p>
+        </div>
+        <ProgressRing pct={animatedPct} done={done} total={TOTAL} />
       </section>
-
-      {/* PROGRESS */}
-      <div className="progress-section">
-        <div className="progress-label">// overall progress</div>
-        <div className="progress-bar-wrap">
-          <div className="progress-bar-fill" style={{ width: `${barWidth}%` }} />
-        </div>
-        <div className="progress-stats">
-          <span>{done} of {TOTAL} modules complete</span>
-          <span>{pct}%</span>
-        </div>
-      </div>
 
       {/* MODULES */}
       <div className="section-title">Course modules</div>
@@ -124,7 +105,6 @@ export default function Home() {
             key={mod.id}
             mod={mod}
             dotClass={getDotClass(mod.id, progress)}
-            onClick={() => mod.to !== '#' && markActive(mod.id)}
           />
         ))}
 

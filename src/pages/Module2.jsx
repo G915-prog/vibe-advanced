@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/Header';
+import { useProgress } from '../hooks/useProgress';
 import CodeBlock from '../components/CodeBlock';
 import PromptCard from '../components/PromptCard';
 import Quiz from '../components/Quiz';
@@ -258,6 +259,7 @@ const SCORE_MSGS = [
 
 // ── Component ──────────────────────────────────────────────────────────────
 export default function Module2() {
+  const { markComplete } = useProgress()
   const [completedEx, setCompletedEx] = useState(() =>
     JSON.parse(localStorage.getItem('vibe-m2-ex') || '{}')
   );
@@ -514,7 +516,7 @@ NEW REQUIREMENT: the spinner should use the existing --accent CSS variable"
         </div>
 
         {/* QUIZ */}
-        <Quiz title="Prompting" questions={QUIZ_QUESTIONS} scoreMessages={SCORE_MSGS} />
+        <Quiz title="Prompting" questions={QUIZ_QUESTIONS} scoreMessages={SCORE_MSGS} onComplete={() => markComplete(2)} />
 
         {/* CAPSTONE */}
         <div style={{ marginBottom: 72 }}>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import Header from '../components/Header'
+import { useProgress } from '../hooks/useProgress'
 import CodeBlock from '../components/CodeBlock'
 import PromptCard from '../components/PromptCard'
 import Quiz from '../components/Quiz'
@@ -146,6 +147,8 @@ const CODE_USEEFFECT = `<span class="kw">import</span> { useState, useEffect } <
 
 // ─── Main page ───
 export default function Module1() {
+  const { markComplete } = useProgress()
+
   useEffect(() => {
     const key = 'vibe-m1-visited'
     if (!localStorage.getItem(key)) {
@@ -281,7 +284,7 @@ Here is the HTML:
       </div>
 
       {/* QUIZ */}
-      <Quiz title="React Foundations" questions={QUESTIONS} scoreMessages={SCORE_MSGS} />
+      <Quiz title="React Foundations" questions={QUESTIONS} scoreMessages={SCORE_MSGS} onComplete={() => markComplete(1)} />
 
       {/* MINI CHALLENGE */}
       <div className="challenge-section">
