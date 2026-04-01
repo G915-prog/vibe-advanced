@@ -5,6 +5,25 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Module 3: merge parallel lesson arrays into single LESSONS array
+- Merged `LESSON_TITLES`, `LESSON_CONTENT`, and `EXERCISES` into a single `LESSONS` array — each object now owns its `title`, content fields, and `exercise` together, making it impossible to desync them by reordering
+- Removed the now-redundant standalone `EXERCISES` array
+- Updated lesson tab render, `current` lookup, and `ExerciseCard` props to read from `LESSONS`
+
+### 2026-04-01 — Refactor Module 3 to use shared components
+- Replaced custom header with `<Header variant="module" />`
+- Replaced custom quiz implementation with shared `<Quiz>` component — normalized QUIZ data to match shared format (`id`, `num`, `total`, `correctKey`, `options[{key,text}]`, `explanation`)
+- Replaced inline prompt cards with shared `<PromptCard>` — passes `technique` as `tag` prop
+- Replaced local `ExerciseCard` function with shared `ExerciseCard` component
+- Replaced coming-up teaser with `<ComingUp kicker title desc />`
+- Replaced custom bottom nav with `<ModuleNav>`
+- Replaced inline code blocks with `<CodeBlock lang={...}>`
+- Added `useProgress` hook + `onComplete={() => markComplete(3)}` on Quiz for completion tracking
+- Removed all inline styles — all layout now uses CSS classes (`wrap`, `module-hero`, `objectives`, `lesson-section`, `callout`, etc.)
+- Removed local `SectionLabel` and `ExerciseCard` sub-component functions
+- Added `.lesson-tabs` / `.lesson-tab` CSS classes for the lesson tab navigation
+- Added `.capstone-card` CSS class for the module capstone section
+
 ### 2026-04-01 — Extract ComingUp component
 - Created `src/components/ComingUp.jsx` — shared teaser for the next module, used at the bottom of every module page
 - Replaced inline `.conversion-teaser` blocks in Module1 and Module2 with `<ComingUp kicker title desc />`

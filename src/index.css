@@ -691,6 +691,19 @@ footer a { color: var(--accent); text-decoration: none; }
 .score-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
 .score-msg { font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 440px; }
 
+/* ─── LESSON TABS ─── */
+.lesson-tabs { display: flex; gap: 2px; margin-bottom: 48px; flex-wrap: wrap; }
+.lesson-tab {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+  padding: 8px 16px; border: 1px solid var(--rule);
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.lesson-tab.active {
+  border-color: var(--ink); background: var(--ink); color: var(--paper);
+}
+.lesson-tab:hover:not(.active) { border-color: var(--muted); color: var(--ink); }
+
 /* ─── CHALLENGE ─── */
 .challenge-section { margin-bottom: 72px; animation: fadeUp 0.6s 0.5s ease both; }
 .challenge-card { border: 2px solid var(--ink); padding: 36px 36px 32px; position: relative; overflow: hidden; }
@@ -725,6 +738,19 @@ footer a { color: var(--accent); text-decoration: none; }
 .deliverable-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
 .deliverable-list li { font-size: 12px; color: var(--muted); display: flex; gap: 10px; }
 .deliverable-list li::before { content: '✓'; color: var(--green); }
+
+.capstone-card { border: 2px solid var(--ink); padding: 36px 36px 32px; position: relative; overflow: hidden; }
+.capstone-card::before {
+  content: 'CAPSTONE';
+  position: absolute;
+  top: 18px; right: 20px;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+.capstone-card h2 { font-family: var(--serif); font-size: 28px; margin-bottom: 12px; }
+.capstone-card .desc { font-size: 13px; line-height: 1.8; color: var(--muted); margin-bottom: 28px; max-width: 600px; }
 
 /* ─── EXERCISE CARD ─── */
 .exercise-card {

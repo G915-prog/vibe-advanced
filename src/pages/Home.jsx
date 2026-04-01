@@ -20,7 +20,7 @@ const MODULES = [
     tags: ['Prompt chains', 'Debugging', 'Iteration'],
   },
   {
-    id: 3, num: '03 — data', to: '#',
+    id: 3, num: '03 — data', to: '/module/3',
     title: 'Supabase\nDatabase',
     desc: 'Postgres + API + Auth in one. Tables, RLS policies, real-time subscriptions. Your backend, handled.',
     tags: ['Supabase', 'Postgres', 'RLS', 'Real-time'],
