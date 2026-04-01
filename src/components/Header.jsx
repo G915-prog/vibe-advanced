@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 
-export default function Header({ variant = 'module' }) {
+export default function Header({ variant = 'home' }) {
   const { isDark, toggle } = useTheme()
 
   return (
@@ -18,7 +18,7 @@ export default function Header({ variant = 'module' }) {
           <NavLink to="/" end>Home</NavLink>
           <NavLink to="/module/1">01 React</NavLink>
           <NavLink to="/module/2">02 Prompting</NavLink>
-          <Link to="#">03 Supabase</Link>
+          <NavLink to="#">03 Supabase</NavLink>
         </nav>
       )}
 

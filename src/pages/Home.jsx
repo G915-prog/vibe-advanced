@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import Header from '../components/Header'
 import ModuleCard from '../components/ModuleCard'
 
@@ -159,8 +159,8 @@ export default function Home() {
               { label: 'Phase 3 — Build', nodes: ['05 Quiz App', '06 Link-in-Bio'] },
               { label: 'Phase 4 — Ship', nodes: ['07 Cloudflare', '08 Auth'] },
             ].map((phase, i) => (
-              <>
-                <div key={phase.label} className="flow-phase">
+              <Fragment key={phase.label}>
+                <div className="flow-phase">
                   <div className="flow-phase-label">{phase.label}</div>
                   <div className="flow-nodes">
                     {phase.nodes.map(n => (
@@ -168,8 +168,8 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div key={`arrow-${i}`} className="flow-arrow">→</div>
-              </>
+                <div className="flow-arrow">→</div>
+              </Fragment>
             ))}
             <div className="flow-phase">
               <div className="flow-phase-label">Capstone</div>

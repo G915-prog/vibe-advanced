@@ -680,6 +680,105 @@ footer a { color: var(--accent); text-decoration: none; }
 .deliverable-list li { font-size: 12px; color: var(--muted); display: flex; gap: 10px; }
 .deliverable-list li::before { content: '✓'; color: var(--green); }
 
+/* ─── EXERCISE CARD ─── */
+.exercise-card {
+  border: 1px solid var(--rule);
+  margin-top: 32px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.exercise-card.completed { border-color: var(--green); }
+
+.exercise-header {
+  padding: 16px 20px;
+  background: var(--paper2);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.exercise-header.open { border-bottom: 1px solid var(--rule); }
+
+.exercise-header-left { display: flex; gap: 12px; align-items: center; }
+.exercise-header-right { display: flex; gap: 12px; align-items: center; }
+
+.exercise-status {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.exercise-status.completed { color: var(--green); }
+
+.exercise-title { font-size: 13px; font-weight: 500; color: var(--ink); }
+.exercise-duration { font-size: 11px; color: var(--faint); }
+
+.exercise-arrow {
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.exercise-arrow.open { transform: rotate(180deg); }
+
+.exercise-body { padding: 20px 20px 24px; }
+.exercise-desc { font-size: 12px; line-height: 1.8; color: var(--muted); margin-bottom: 20px; }
+
+.exercise-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.exercise-step { display: flex; gap: 14px; font-size: 12px; line-height: 1.6; }
+
+.exercise-step-num {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exercise-step-text { color: var(--muted); padding-top: 2px; }
+
+.exercise-reflection {
+  border-top: 1px solid var(--rule);
+  padding-top: 14px;
+  margin-bottom: 20px;
+}
+.exercise-reflection-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.exercise-reflection-text { font-size: 12px; color: var(--muted); font-style: italic; }
+
+.exercise-done-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--rule);
+  padding: 8px 16px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+.exercise-done-btn.completed {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+
 /* ─── CONVERSION TEASER ─── */
 .conversion-teaser {
   border: 1px solid var(--rule);
