@@ -59,6 +59,7 @@ const MODULES = [
 
 function getDotClass(id, progress) {
   if (progress[id]) return 'status-dot done'
+  if (Object.keys(progress).length === 0) return 'status-dot'
   const nextModule = (() => {
     for (let i = 1; i <= TOTAL; i++) if (!progress[i]) return i
     return TOTAL
