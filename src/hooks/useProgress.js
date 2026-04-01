@@ -31,12 +31,16 @@ export function useProgress() {
     let cancelled = false
 
     async function fetchProgress() {
+      if (cancelled) return
       setLoading(true)
       setError(null)
 
-      const { data: { user } } = await supabase.auth.getUser()
+      // getSession() reads the cached token from localStorage — no network call,
+      // so the ring never shows stale 0% while waiting for a round-trip.
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
         return
       }
 
@@ -56,6 +60,12 @@ export function useProgress() {
     }
 
     fetchProgress()
+
+    // Re-fetch whenever the user signs in or out so the ring always reflects
+    // the current auth state without requiring a page reload.
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(() => {
+      fetchProgress()
+    })
 
     // ─── Realtime subscription ──────────────────────────────────────────────
     // Updates local state in place instead of re-fetching — avoids a round
@@ -86,9 +96,10 @@ export function useProgress() {
       .subscribe()
 
     // Cleanup — unsubscribe when the component unmounts (or the effect re-runs).
-    // Without this, every mount leaks a WebSocket connection.
+    // Without this, every mount leaks a WebSocket connection and an auth listener.
     return () => {
       cancelled = true
+      authSub.unsubscribe()
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
