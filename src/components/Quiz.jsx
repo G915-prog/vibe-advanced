@@ -23,7 +23,7 @@ export default function Quiz({ title, questions, scoreMessages, onComplete }) {
         {title} <em style={{ fontStyle: 'italic', color: 'var(--accent)' }}>Quiz</em>
       </h2>
       <p className="quiz-intro">
-        Five questions. Click an option to answer — you'll see the explanation immediately. No pressure, this is just for you.
+        {questions.length} questions. Click an option to answer — you'll see the explanation immediately. No pressure, this is just for you.
       </p>
 
       {questions.map(q => {

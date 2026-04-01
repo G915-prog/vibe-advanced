@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### 2026-04-01 — Fix hardcoded quiz question count
+- `Quiz.jsx` intro text now uses `{questions.length}` instead of hardcoded "Five questions"
+
 ### 2026-04-01 — Progress ring + completion tracking
 - Created `src/hooks/useProgress.js` — shared hook for reading/writing `vibe-progress` to localStorage; replaces inline state in `Home.jsx`
 - Created `src/components/ProgressRing.jsx` — animated SVG ring with accent-to-accent2 gradient, percentage and module count in center
