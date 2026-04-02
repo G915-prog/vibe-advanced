@@ -5,6 +5,12 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v4.2.2 — 2026-04-02 — useFetch: 300ms visibility delay
+- `useFetch.js` — fetch is now deferred by 300ms via `setTimeout`; cleanup cancels both the timer (`clearTimeout`) and any in-flight request (`controller.abort()`); navigating away before 300ms fires no network request at all; cache hits still resolve instantly with no delay
+
+### v4.2.1 — 2026-04-02 — useFetch: 5-minute module-level cache
+- `useFetch.js` — added module-level `Map` cache with 5-minute TTL; cache is checked before every fetch and populated on success; `refetch()` busts the cache entry so manual retries always hit the network; initial `data`/`loading` state is seeded from cache so remounted components render instantly with no flicker
+
 ### v4.2.0 — 2026-04-02 — RandomFact widget on home page
 - Created `src/components/RandomFact.jsx` — fetches a random fact from the Useless Facts API on mount via `useFetch`; shows a shimmer skeleton while loading, an error state with retry button on failure, and a friendly empty state; "New fact" button calls `refetch` for a fresh fact; source link opens in new tab when present
 - `Home.jsx` — added `RandomFact` widget below the stack section
