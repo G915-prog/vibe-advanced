@@ -5,7 +5,13 @@ Advanced vibecoding course
 
 ## Changelog
 
-### 2026-04-01 — Remove window.supabase debug leak
+### 2026-04-02 — Add Module 4: API Integration
+- Created `src/pages/Module4.jsx` — 6 lessons (REST APIs, env vars, async patterns, calling a public API, defensive response handling, useFetch hook), 6 exercises, 5-question quiz, 6 prompt templates, two-part capstone
+- `App.jsx` — added `/module/4` route wrapped in `ProtectedRoute`; imported `Module4`
+- `Home.jsx` — Module 4 card (`id: 4`) already linked to `/module/4`
+- `Module3.jsx` — updated ModuleNav `next` to point to `/module/4` instead of `#`
+
+### 2026-04-02 — Remove window.supabase debug leak
 - Removed `window.supabase = supabase` from `src/lib/supabase.js` — debug line that exposed the Supabase client on the global object, allowing anyone with DevTools access to query the database directly
 
 ### 2026-04-01 — Add Supabase Auth
