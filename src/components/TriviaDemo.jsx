@@ -23,6 +23,7 @@ export default function TriviaDemo() {
   const [selected, setSelected] = useState(null)
   const [score, setScore]       = useState(0)
   const [finished, setFinished] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -58,7 +59,7 @@ export default function TriviaDemo() {
 
     fetchQuestions()
     return () => controller.abort()
-  }, [])
+  }, [retryCount])
 
   function handleSelect(answer) {
     if (selected !== null) return  // already answered
@@ -88,7 +89,12 @@ export default function TriviaDemo() {
   }
 
   if (loading) return <p className="demo-loading">Fetching questions…</p>
-  if (error)   return <p className="demo-error">Error: {error}</p>
+  if (error)   return (
+    <div className="demo-error">
+      <p>Error: {error}</p>
+      <button className="trivia-btn" onClick={() => setRetryCount(c => c + 1)}>Try again</button>
+    </div>
+  )
   if (questions.length === 0) return <p className="demo-empty">No questions returned.</p>
 
   if (finished) return (

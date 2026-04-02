@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v4.0.2 — 2026-04-02 — TriviaDemo: retry on fetch error
+- Added `retryCount` state; "Try again" button shown in error state increments it; `retryCount` added to `useEffect` dependency array so the fetch re-runs on each retry
+
 ### v4.0.1 — 2026-04-02 — Extract TriviaDemo to component
 - Created `src/components/TriviaDemo.jsx` — moved inline `TriviaDemo` and `shuffle` out of `Module4.jsx` into a standalone exported component
 - `Module4.jsx` — removed inline component and `useEffect` import; added `import TriviaDemo from '../components/TriviaDemo'`
