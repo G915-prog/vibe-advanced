@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v4.1.1 — 2026-04-02 — Fix HTML entities in trivia category
+- `TriviaDemo.jsx` — category span switched to `dangerouslySetInnerHTML` so `&amp;` and similar entities render correctly (same treatment as question and answer text)
+
 ### v4.1.0 — 2026-04-02 — Extract useFetch hook
 - Created `src/hooks/useFetch.js` — reusable hook accepting a `url` string; returns `{ data, loading, error, refetch }`; handles AbortController cleanup, `res.ok` check, and retry via internal `retryCount`
 - `TriviaDemo.jsx` — removed all fetch `useState`/`useEffect` code; replaced with `useFetch(TRIVIA_URL)`; API response validation and answer shuffling moved into a separate `useEffect` watching `data`; retry button now calls `refetch` from the hook

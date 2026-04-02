@@ -92,7 +92,7 @@ export default function TriviaDemo() {
   return (
     <div className="trivia-game">
       <div className="trivia-game-meta">
-        <span className="trivia-category">{q.category}</span>
+        <span className="trivia-category" dangerouslySetInnerHTML={{ __html: q.category }} />
         <span className={`trivia-badge ${q.difficulty}`}>{q.difficulty}</span>
         <span className="trivia-progress">{index + 1} / {questions.length}</span>
       </div>
