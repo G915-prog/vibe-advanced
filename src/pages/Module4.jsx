@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Header from '../components/Header'
 import ComingUp from '../components/ComingUp'
 import { useProgress } from '../hooks/useProgress'
@@ -7,6 +7,7 @@ import PromptCard from '../components/PromptCard'
 import Quiz from '../components/Quiz'
 import ModuleNav from '../components/ModuleNav'
 import ExerciseCard from '../components/ExerciseCard'
+import TriviaDemo from '../components/TriviaDemo'
 
 // ── Quiz data ──────────────────────────────────────────────────────────────
 const SCORE_MSGS = [
@@ -543,61 +544,6 @@ function TriviaList() {
     },
   },
 ]
-
-// ── Live demo ─────────────────────────────────────────────────────────────
-// Fetches 5 random trivia questions from the Open Trivia Database.
-// Response shape: { response_code: 0, results: [{ category, difficulty, question, ... }] }
-function TriviaDemo() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError]     = useState(null)
-  const [data, setData]       = useState(null)
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function fetchQuestions() {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=5&type=multiple`,
-          { signal: controller.signal }
-        )
-        if (!res.ok) throw new Error(`Server returned ${res.status}: ${res.statusText}`)
-        const json = await res.json()
-        console.log('opentdb full response:', json)
-        if (json.response_code !== 0) throw new Error(`API error code: ${json.response_code}`)
-        setData(json.results ?? [])
-      } catch (err) {
-        // AbortError fires on unmount — not a real error
-        if (err.name === 'AbortError') return
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchQuestions()
-    return () => controller.abort()
-  }, [])
-
-  if (loading) return <p className="demo-loading">Fetching questions…</p>
-  if (error)   return <p className="demo-error">Error: {error}</p>
-  if (data.length === 0) return <p className="demo-empty">No questions returned.</p>
-
-  return (
-    <ul className="trivia-demo-list">
-      {data.map((q, i) => (
-        <li key={i} className="trivia-demo-item">
-          <span className="trivia-demo-category">{q.category}</span>
-          <span className={`trivia-demo-badge ${q.difficulty}`}>{q.difficulty}</span>
-          {/* API returns HTML-encoded strings — decode with dangerouslySetInnerHTML */}
-          <p className="trivia-demo-question" dangerouslySetInnerHTML={{ __html: q.question }} />
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 // ── Component ──────────────────────────────────────────────────────────────
 export default function Module4() {
