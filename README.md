@@ -5,6 +5,11 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v4.2.0 — 2026-04-02 — RandomFact widget on home page
+- Created `src/components/RandomFact.jsx` — fetches a random fact from the Useless Facts API on mount via `useFetch`; shows a shimmer skeleton while loading, an error state with retry button on failure, and a friendly empty state; "New fact" button calls `refetch` for a fresh fact; source link opens in new tab when present
+- `Home.jsx` — added `RandomFact` widget below the stack section
+- `index.css` — added `.fact-card`, `.fact-kicker`, `.fact-text`, `.fact-footer`, `.fact-source`, `.fact-btn`, `.fact-skeleton`, `.fact-skeleton-line` (with `.fact-skeleton-wide`/`.fact-skeleton-narrow` variants), `.fact-error`, `.fact-empty`; added `@keyframes shimmer` for the loading skeleton
+
 ### v4.1.1 — 2026-04-02 — Fix HTML entities in trivia category
 - `TriviaDemo.jsx` — category span switched to `dangerouslySetInnerHTML` so `&amp;` and similar entities render correctly (same treatment as question and answer text)
 

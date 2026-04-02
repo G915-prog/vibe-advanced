@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import ModuleCard from '../components/ModuleCard'
 import ProgressRing from '../components/ProgressRing'
 import { useProgress } from '../hooks/useProgress'
+import RandomFact from '../components/RandomFact'
 
 const TOTAL = 8
 
@@ -195,6 +196,10 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      {/* RANDOM FACT */}
+      <div className="section-title">Random fact</div>
+      <RandomFact />
 
       {/* FOOTER */}
       <footer>
