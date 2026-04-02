@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useFetch } from '../hooks/useFetch'
 
 // Fetches 5 random trivia questions from the Open Trivia Database.
 // Response shape: { response_code: 0, results: [{ category, difficulty, question, correct_answer, incorrect_answers }] }
@@ -13,53 +14,33 @@ function shuffle(arr) {
   return a
 }
 
+const TRIVIA_URL = `${import.meta.env.VITE_TRIVIA_API_URL}?amount=5&type=multiple`
+
 export default function TriviaDemo() {
-  const [loading, setLoading]     = useState(true)
-  const [error, setError]         = useState(null)
-  const [questions, setQuestions] = useState([])
+  const { data, loading, error, refetch } = useFetch(TRIVIA_URL)
 
   // current question index, selected answer, and score
   const [index, setIndex]       = useState(0)
   const [selected, setSelected] = useState(null)
   const [score, setScore]       = useState(0)
   const [finished, setFinished] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
+  const [questions, setQuestions] = useState([])
 
+  // When fresh data arrives, validate the API response code and pre-shuffle answers
   useEffect(() => {
-    const controller = new AbortController()
-
-    async function fetchQuestions() {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=5&type=multiple`,
-          { signal: controller.signal }
-        )
-        if (!res.ok) throw new Error(`Server returned ${res.status}: ${res.statusText}`)
-        const json = await res.json()
-        // response_code 1 = no results (e.g. amount=0) — treat as empty, not an error
-        if (json.response_code !== 0 && json.response_code !== 1) {
-          throw new Error(`API error code: ${json.response_code}`)
-        }
-        // Pre-shuffle answers once when data loads so order stays stable during render
-        const prepared = (json.results ?? []).map(q => ({
-          ...q,
-          answers: shuffle([q.correct_answer, ...q.incorrect_answers]),
-        }))
-        setQuestions(prepared)
-      } catch (err) {
-        // AbortError fires on unmount — not a real error
-        if (err.name === 'AbortError') return
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchQuestions()
-    return () => controller.abort()
-  }, [retryCount])
+    if (!data) return
+    // response_code 1 = no results — treat as empty, not an error
+    if (data.response_code !== 0 && data.response_code !== 1) return
+    const prepared = (data.results ?? []).map(q => ({
+      ...q,
+      answers: shuffle([q.correct_answer, ...q.incorrect_answers]),
+    }))
+    setQuestions(prepared)
+    setIndex(0)
+    setSelected(null)
+    setScore(0)
+    setFinished(false)
+  }, [data])
 
   function handleSelect(answer) {
     if (selected !== null) return  // already answered
@@ -92,7 +73,7 @@ export default function TriviaDemo() {
   if (error)   return (
     <div className="demo-error">
       <p>Error: {error}</p>
-      <button className="trivia-btn" onClick={() => setRetryCount(c => c + 1)}>Try again</button>
+      <button className="trivia-btn" onClick={refetch}>Try again</button>
     </div>
   )
   if (questions.length === 0) return <p className="demo-empty">No questions returned.</p>
@@ -111,30 +92,32 @@ export default function TriviaDemo() {
   return (
     <div className="trivia-game">
       <div className="trivia-game-meta">
-        <span className="trivia-demo-category">{q.category}</span>
-        <span className={`trivia-demo-badge ${q.difficulty}`}>{q.difficulty}</span>
+        <span className="trivia-category">{q.category}</span>
+        <span className={`trivia-badge ${q.difficulty}`}>{q.difficulty}</span>
         <span className="trivia-progress">{index + 1} / {questions.length}</span>
       </div>
 
-      {/* API returns HTML-encoded strings — decode with dangerouslySetInnerHTML */}
-      <p className="trivia-game-question" dangerouslySetInnerHTML={{ __html: q.question }} />
+      <div className="trivia-card">
+        {/* API returns HTML-encoded strings — decode with dangerouslySetInnerHTML */}
+        <p className="trivia-game-question" dangerouslySetInnerHTML={{ __html: q.question }} />
 
-      <div className="trivia-options">
-        {q.answers.map((answer, i) => {
-          let cls = 'trivia-option'
-          if (selected !== null) {
-            if (answer === q.correct_answer) cls += ' correct'
-            else if (answer === selected)    cls += ' wrong'
-          }
-          return (
-            <button
-              key={i}
-              className={cls}
-              onClick={() => handleSelect(answer)}
-              dangerouslySetInnerHTML={{ __html: answer }}
-            />
-          )
-        })}
+        <div className="trivia-options">
+          {q.answers.map((answer, i) => {
+            let cls = 'trivia-option'
+            if (selected !== null) {
+              if (answer === q.correct_answer) cls += ' correct'
+              else if (answer === selected)    cls += ' wrong'
+            }
+            return (
+              <button
+                key={i}
+                className={cls}
+                onClick={() => handleSelect(answer)}
+                dangerouslySetInnerHTML={{ __html: answer }}
+              />
+            )
+          })}
+        </div>
       </div>
 
       {selected !== null && (

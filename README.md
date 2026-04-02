@@ -5,6 +5,10 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v4.1.0 — 2026-04-02 — Extract useFetch hook
+- Created `src/hooks/useFetch.js` — reusable hook accepting a `url` string; returns `{ data, loading, error, refetch }`; handles AbortController cleanup, `res.ok` check, and retry via internal `retryCount`
+- `TriviaDemo.jsx` — removed all fetch `useState`/`useEffect` code; replaced with `useFetch(TRIVIA_URL)`; API response validation and answer shuffling moved into a separate `useEffect` watching `data`; retry button now calls `refetch` from the hook
+
 ### v4.0.2 — 2026-04-02 — TriviaDemo: retry on fetch error
 - Added `retryCount` state; "Try again" button shown in error state increments it; `retryCount` added to `useEffect` dependency array so the fetch re-runs on each retry
 
