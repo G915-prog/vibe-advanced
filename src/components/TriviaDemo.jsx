@@ -32,12 +32,15 @@ export default function TriviaDemo() {
       setError(null)
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=5&type=multiple`,
+          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=0&type=multiple`,
           { signal: controller.signal }
         )
         if (!res.ok) throw new Error(`Server returned ${res.status}: ${res.statusText}`)
         const json = await res.json()
-        if (json.response_code !== 0) throw new Error(`API error code: ${json.response_code}`)
+        // response_code 1 = no results (e.g. amount=0) — treat as empty, not an error
+        if (json.response_code !== 0 && json.response_code !== 1) {
+          throw new Error(`API error code: ${json.response_code}`)
+        }
         // Pre-shuffle answers once when data loads so order stays stable during render
         const prepared = (json.results ?? []).map(q => ({
           ...q,
