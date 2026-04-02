@@ -723,14 +723,16 @@ footer a { color: var(--accent); text-decoration: none; }
 
 .step-badge {
   flex-shrink: 0;
-  width: 22px; height: 22px;
+  padding: 2px 7px;
   background: var(--ink);
   color: var(--paper);
+  font-family: var(--mono);
   font-size: 10px;
-  display: flex;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .deliverables { border-top: 1px solid var(--rule); padding-top: 20px; }
