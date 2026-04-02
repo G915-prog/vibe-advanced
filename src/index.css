@@ -1033,6 +1033,198 @@ footer a { color: var(--accent); text-decoration: none; }
 .fact-error-msg { font-size: 13px; color: #f87171; }
 .fact-empty { font-size: 13px; color: var(--muted); padding: 20px 0; font-style: italic; }
 
+/* ─── MODULE 5: BUILD GUIDE ─── */
+.build-guide { display: flex; flex-direction: column; gap: 32px; }
+.build-step {
+  border: 1px solid var(--rule);
+  padding: 28px 32px 24px;
+  position: relative;
+}
+.build-step-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.build-step-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.build-step-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.build-step-desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 16px;
+  max-width: 680px;
+}
+.build-step-prompt-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+.build-step-done {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ─── MODULE 5: DEPLOY CHECKLIST ─── */
+.deploy-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.deploy-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.deploy-track {
+  flex: 1;
+  height: 3px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.deploy-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+.deploy-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.deploy-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 3px;
+  transition: background 0.12s;
+}
+.deploy-item:hover { background: rgba(0,0,0,0.03); }
+.deploy-item.checked .deploy-label { color: var(--muted); text-decoration: line-through; }
+.deploy-checkbox {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.deploy-label { font-size: 12px; line-height: 1.7; color: var(--ink); }
+
+/* ─── MODULE 5: RUBRIC ─── */
+.rubric { display: flex; flex-direction: column; gap: 0; }
+.rubric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+}
+.rubric-col-criterion,
+.rubric-col-levels {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.rubric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.rubric-criterion {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.rubric-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.rubric-desc {
+  font-size: 11px;
+  color: var(--faint);
+  line-height: 1.5;
+}
+.rubric-levels {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.rubric-btn {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 5px 10px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.rubric-btn:hover { border-color: var(--accent); color: var(--accent); }
+.rubric-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.rubric-footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 16px;
+}
+.rubric-total { display: flex; align-items: baseline; gap: 4px; }
+.rubric-score {
+  font-family: var(--serif);
+  font-size: 32px;
+  color: var(--ink);
+  line-height: 1;
+}
+.rubric-out-of { font-size: 13px; color: var(--muted); }
+.rubric-grade-block { display: flex; align-items: center; gap: 10px; }
+.rubric-grade-badge {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.rubric-grade-msg { font-size: 13px; color: var(--muted); }
+
 /* ─── MODULE NAV ─── */
 .module-nav {
   border-top: 1px solid var(--rule);

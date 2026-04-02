@@ -5,6 +5,13 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v5.0.0 — 2026-04-02 — Module 5: Project I — The Quiz App
+- Created `src/pages/Module5.jsx` — project-guide module (no lesson tabs); sections: hero, project brief, component architecture, Supabase schema, 10-step build guide, 12-item deployment checklist, 8-criterion self-assessment rubric, capstone teaser, bottom nav
+- `App.jsx` — added `/module/5` route wrapped in `ProtectedRoute`; imported `Module5`
+- `Home.jsx` — Module 5 card (`id: 5`) updated to link to `/module/5`
+- `Header.jsx` — added `05 Quiz App` NavLink pointing to `/module/5`
+- `index.css` — added `/* ─── MODULE 5: BUILD GUIDE ─── */` (`.build-guide`, `.build-step`, `.build-step-header`, `.build-step-num`, `.build-step-title`, `.build-step-desc`, `.build-step-prompt-label`, `.build-step-done`), `/* ─── MODULE 5: DEPLOY CHECKLIST ─── */` (`.deploy-progress`, `.deploy-count`, `.deploy-track`, `.deploy-fill`, `.deploy-checklist`, `.deploy-item`, `.deploy-checkbox`, `.deploy-label`), `/* ─── MODULE 5: RUBRIC ─── */` (`.rubric`, `.rubric-header`, `.rubric-row`, `.rubric-criterion`, `.rubric-name`, `.rubric-desc`, `.rubric-levels`, `.rubric-btn`, `.rubric-footer`, `.rubric-total`, `.rubric-score`, `.rubric-out-of`, `.rubric-grade-badge`, `.rubric-grade-msg`); checklist and rubric state persisted in localStorage under `vibe-m5-deploy` and `vibe-m5-rubric`
+
 ### v4.2.2 — 2026-04-02 — useFetch: 300ms visibility delay
 - `useFetch.js` — fetch is now deferred by 300ms via `setTimeout`; cleanup cancels both the timer (`clearTimeout`) and any in-flight request (`controller.abort()`); navigating away before 300ms fires no network request at all; cache hits still resolve instantly with no delay
 

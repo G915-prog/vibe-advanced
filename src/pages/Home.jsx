@@ -33,7 +33,7 @@ const MODULES = [
     tags: ['REST', 'fetch()', 'env vars', 'async/await'],
   },
   {
-    id: 5, num: '05 — project I', to: '#',
+    id: 5, num: '05 — project I', to: '/module/5',
     title: 'Build: The\nQuiz App',
     desc: 'Categories, timers, scores, auth, leaderboard. React + Supabase, deployed. Your first full-stack app.',
     tags: ['Full-stack', 'Auth', 'Leaderboard', 'Deploy'],
