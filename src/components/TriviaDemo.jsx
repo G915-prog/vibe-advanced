@@ -32,7 +32,7 @@ export default function TriviaDemo() {
       setError(null)
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=0&type=multiple`,
+          `${import.meta.env.VITE_TRIVIA_API_URL}?amount=5&type=multiple`,
           { signal: controller.signal }
         )
         if (!res.ok) throw new Error(`Server returned ${res.status}: ${res.statusText}`)
