@@ -943,6 +943,7 @@ function UsernameForm() {
             <Callout>
               <strong>This is how every social platform works</strong> — Twitter, GitHub, LinkedIn. One component, infinite unique URLs. The component logic is the same for every profile; only the data changes based on the URL parameter.
             </Callout>
+            <PromptCard label={PROMPTS[0].label} text={PROMPTS[0].text} tag={PROMPTS[0].technique} />
             <ExerciseCard
               ex={EXERCISES[0]}
               completed={completedEx['ex1']}
@@ -1012,6 +1013,9 @@ async function deleteLink(id) {
             <Callout>
               <strong>Optimistic updates make your app feel instant.</strong> The user never waits for a round trip. If the DB write fails, you silently restore the previous state. Most writes succeed — designing for the success path first is the right call.
             </Callout>
+            <PromptCard label={PROMPTS[1].label} text={PROMPTS[1].text} tag={PROMPTS[1].technique} />
+            <PromptCard label={PROMPTS[3].label} text={PROMPTS[3].text} tag={PROMPTS[3].technique} />
+            <PromptCard label={PROMPTS[4].label} text={PROMPTS[4].text} tag={PROMPTS[4].technique} />
             <ExerciseCard
               ex={EXERCISES[1]}
               completed={completedEx['ex2']}
@@ -1073,6 +1077,7 @@ function DraggableList({ items, onReorder }) {
             <Callout>
               <strong>Once you implement drag-and-drop from scratch once, you'll never be intimidated by it again.</strong> It's just two index numbers and an array splice. The browser handles the visual drag behaviour — you only manage the data.
             </Callout>
+            <PromptCard label={PROMPTS[2].label} text={PROMPTS[2].text} tag={PROMPTS[2].technique} />
             <ExerciseCard
               ex={EXERCISES[2]}
               completed={completedEx['ex3']}
@@ -1129,6 +1134,7 @@ export default function QRCode({ url }) {
             <Callout>
               <strong>The entire QR generation happens in the browser</strong> — no API call, no server, no cost. The canvas API lets you export it as a PNG instantly. This is a general pattern: canvas → toDataURL() → download link. It works for charts, screenshots, and any canvas-rendered content.
             </Callout>
+            <PromptCard label={PROMPTS[5].label} text={PROMPTS[5].text} tag={PROMPTS[5].technique} />
             <ExerciseCard
               ex={EXERCISES[3]}
               completed={completedEx['ex4']}
@@ -1293,18 +1299,6 @@ export default function QRCode({ url }) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* PROMPT TEMPLATES */}
-      <div className="lesson-section">
-        <div className="section-label">Prompt template library</div>
-        <h2>Copy-paste <em>prompts</em></h2>
-        <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 32, lineHeight: 1.7 }}>
-          All six prompts from across this module, ready to use.
-        </p>
-        {PROMPTS.map((p, i) => (
-          <PromptCard key={i} label={p.label} text={p.text} tag={p.technique} />
-        ))}
       </div>
 
       {/* CAPSTONE TEASER */}
