@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import ComingUp from '../components/ComingUp'
 import CodeBlock from '../components/CodeBlock'
 import ModuleNav from '../components/ModuleNav'
+import { useProgress } from '../hooks/useProgress'
 
 // ── Component architecture tree ────────────────────────────────────────────
 const ARCH_TREE = `QuizApp  (src/pages/QuizApp.jsx)
@@ -418,6 +419,7 @@ function getGrade(score) {
 
 // ── Component ──────────────────────────────────────────────────────────────
 export default function Module5() {
+  const { markComplete } = useProgress()
   const [checks, setChecks] = useState(
     () => JSON.parse(localStorage.getItem('vibe-m5-deploy') || '{}')
   )
@@ -440,6 +442,10 @@ export default function Module5() {
   const checkedCount = Object.values(checks).filter(Boolean).length
   const rubricTotal  = RUBRIC_CRITERIA.reduce((sum, c) => sum + (rubric[c.key] ?? 0), 0)
   const gradeInfo    = getGrade(rubricTotal)
+
+  useEffect(() => {
+    if (checkedCount === DEPLOY_ITEMS.length) markComplete(5)
+  }, [checkedCount])
 
   return (
     <div className="wrap">

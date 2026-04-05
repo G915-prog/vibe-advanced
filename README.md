@@ -5,6 +5,10 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v5.0.1 — 2026-04-05 — Module 5: wire up homepage progress ring
+
+- `Module5.jsx` — added `useProgress` + `useEffect`; calls `markComplete(5)` when all 12 deploy checklist items are checked, updating the homepage progress ring
+
 ### v5.0.0 — 2026-04-02 — Module 5: Project I — The Quiz App
 - Created `src/pages/Module5.jsx` — project-guide module (no lesson tabs); sections: hero, project brief, component architecture, Supabase schema, 10-step build guide, 12-item deployment checklist, 8-criterion self-assessment rubric, capstone teaser, bottom nav; all 10 build-step prompts target a brand new standalone Vite + React project — the Quiz App is built as its own repo and deployment, completely separate from the VIBE:ADVANCED course site
 - `App.jsx` — added `/module/5` route wrapped in `ProtectedRoute`; imported `Module5`
