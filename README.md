@@ -10,6 +10,7 @@ Advanced vibecoding course
 - `App.jsx` — added `/module/6` route wrapped in `ProtectedRoute`; imported `Module6`
 - `Home.jsx` — Module 6 card (`id: 6`) updated from `'#'` to `'/module/6'`
 - `Module5.jsx` — updated ModuleNav `next` link from `'#'` to `'/module/6'`
+- `Header.jsx` — added `06 Link-in-Bio` NavLink pointing to `/module/6`
 
 ### v5.0.1 — 2026-04-05 — Module 5: wire up homepage progress ring
 

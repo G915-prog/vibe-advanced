@@ -23,6 +23,7 @@ export default function Header({ variant = 'home' }) {
           <NavLink to="/module/3">03 Supabase</NavLink>
           <NavLink to="/module/4">04 API</NavLink>
           <NavLink to="/module/5">05 Quiz App</NavLink>
+          <NavLink to="/module/6">06 Link-in-Bio</NavLink>
         </nav>
       )}
 
