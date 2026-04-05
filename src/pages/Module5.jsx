@@ -636,7 +636,7 @@ export default function Module5() {
       {/* MODULE NAV */}
       <ModuleNav
         prev={{ to: '/module/4', label: '04 API Integration' }}
-        next={{ to: '#', label: '06 Link-in-Bio' }}
+        next={{ to: '/module/6', label: '06 Link-in-Bio' }}
       />
     </div>
   )

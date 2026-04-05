@@ -5,6 +5,12 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v6.0.0 — 2026-04-05 — Module 6: Project II — Link-in-Bio
+- Created `src/pages/Module6.jsx` — combined lessons + project-guide module; sections: hero (Module 06, 10–14 hrs, Advanced, React + Supabase + Vercel), objectives, 4-lesson tab nav (dynamic routing, CRUD with Supabase, drag-to-reorder, client-side QR code), project brief, component architecture tree, Supabase schema (profiles + links tables, 5 RLS policies + increment_click_count RPC function), 12-step build guide, 14-item deployment checklist, 8-criterion self-assessment rubric, 6 prompt templates, Module 07 capstone teaser, bottom nav; exercise completion persists in localStorage under `vibe-m6-ex`, checklist under `vibe-m6-deploy`, rubric under `vibe-m6-rubric`; calls `markComplete(6)` when all 14 deploy items are checked
+- `App.jsx` — added `/module/6` route wrapped in `ProtectedRoute`; imported `Module6`
+- `Home.jsx` — Module 6 card (`id: 6`) updated from `'#'` to `'/module/6'`
+- `Module5.jsx` — updated ModuleNav `next` link from `'#'` to `'/module/6'`
+
 ### v5.0.1 — 2026-04-05 — Module 5: wire up homepage progress ring
 
 - `Module5.jsx` — added `useProgress` + `useEffect`; calls `markComplete(5)` when all 12 deploy checklist items are checked, updating the homepage progress ring

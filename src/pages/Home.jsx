@@ -39,7 +39,7 @@ const MODULES = [
     tags: ['Full-stack', 'Auth', 'Leaderboard', 'Deploy'],
   },
   {
-    id: 6, num: '06 — project II', to: '#',
+    id: 6, num: '06 — project II', to: '/module/6',
     title: 'Build: Link-\nin-Bio',
     desc: 'Custom profile pages, link management, click tracking. Public URLs. Like Linktree, but yours.',
     tags: ['Dynamic routes', 'Profiles', 'Click tracking'],
