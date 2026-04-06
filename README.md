@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v6.0.2 — 2026-04-06 — Module 6: restructure lessons into build guide
+- `src/pages/Module6.jsx` — removed standalone 4-tab lesson section; lessons now live inline within the build step where their concept is first needed: dynamic routing concept → step 04 (ProfilePage), QR code concept → step 07 (QRCode component), CRUD + optimistic updates concept → step 10 (useLinks hook), drag-to-reorder concept → step 11 (DraggableLinkItem); PromptCards follow the same placement (theme → step 05, click tracking → step 06); ExerciseCards appear immediately after their relevant step; removed `activeLesson` state and `lessonTitles` array; project brief, component architecture, and Supabase schema sections remain before the build guide
+
 ### v6.0.1 — 2026-04-05 — Favicon
 - `public/favicon.svg` — created SVG favicon: dark background (#111), white V-mark path, red accent underline (#c84b2f); matches the site's editorial aesthetic
 - `index.html` — added `<link rel="icon" type="image/svg+xml" href="/favicon.svg" />`

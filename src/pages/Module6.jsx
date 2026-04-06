@@ -587,7 +587,6 @@ function getGrade(score) {
 const EXERCISES = [
   {
     id: 'ex1',
-    lesson: 1,
     title: 'Add a dynamic profile route',
     duration: '20 min',
     desc: 'Add a /profile/:username route to your link-in-bio App.jsx. Create a bare ProfilePage component that reads the username from useParams() and displays it on screen. Confirm different usernames render without reloading the page.',
@@ -602,7 +601,6 @@ const EXERCISES = [
   },
   {
     id: 'ex2',
-    lesson: 2,
     title: 'Build a useLinks hook with optimistic CRUD',
     duration: '30 min',
     desc: 'Build a useLinks hook that exposes addLink, updateLink, and deleteLink. Each function updates local state immediately (optimistic) and syncs to Supabase in the background, rolling back on error.',
@@ -617,7 +615,6 @@ const EXERCISES = [
   },
   {
     id: 'ex3',
-    lesson: 3,
     title: 'Make the link list draggable',
     duration: '25 min',
     desc: 'Make the link list draggable using the HTML5 drag-and-drop API — no libraries. Drag a link to a new position, confirm the order updates locally, then verify it persists after a page refresh.',
@@ -632,7 +629,6 @@ const EXERCISES = [
   },
   {
     id: 'ex4',
-    lesson: 4,
     title: 'Build a QR code component with download',
     duration: '20 min',
     desc: 'Install qrcode, build a QRCode component that renders the user\'s public profile URL as a QR code on a canvas element, and add a button that downloads it as a PNG file.',
@@ -787,7 +783,6 @@ No external QR library other than qrcode. CSS classes only.`,
 // ── Component ──────────────────────────────────────────────────────────────
 export default function Module6() {
   const { markComplete } = useProgress()
-  const [activeLesson, setActiveLesson] = useState(1)
   const [completedEx, setCompletedEx] = useState(() =>
     JSON.parse(localStorage.getItem('vibe-m6-ex') || '{}')
   )
@@ -824,13 +819,6 @@ export default function Module6() {
     if (checkedCount === DEPLOY_ITEMS.length) markComplete(6)
   }, [checkedCount])
 
-  const lessonTitles = [
-    'Dynamic routing',
-    'CRUD with Supabase',
-    'Drag to reorder',
-    'Client-side QR code',
-  ]
-
   return (
     <div className="wrap">
       <Header variant="module" />
@@ -858,290 +846,6 @@ export default function Module6() {
           <li>Generate a QR code entirely client-side without external services</li>
           <li>Deploy a multi-page app where every public profile has its own URL</li>
         </ul>
-      </div>
-
-      {/* LESSONS */}
-      <div style={{ marginBottom: 72 }}>
-        {/* Tab nav */}
-        <div style={{ display: 'flex', gap: 2, marginBottom: 48, flexWrap: 'wrap' }}>
-          {lessonTitles.map((t, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveLesson(i + 1)}
-              style={{
-                fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.08em',
-                padding: '8px 16px', border: '1px solid',
-                borderColor: activeLesson === i + 1 ? 'var(--ink)' : 'var(--rule)',
-                background: activeLesson === i + 1 ? 'var(--ink)' : 'transparent',
-                color: activeLesson === i + 1 ? 'var(--paper)' : 'var(--muted)',
-                cursor: 'pointer', transition: 'all 0.15s',
-              }}
-            >
-              {String(i + 1).padStart(2, '0')} {t}
-            </button>
-          ))}
-        </div>
-
-        {/* ── LESSON 1: DYNAMIC ROUTING ── */}
-        {activeLesson === 1 && (
-          <div style={{ marginBottom: 72 }}>
-            <SectionLabel text="Lesson 1 of 4" />
-            <LessonHeading main="Dynamic routing with" accent="React Router" />
-            <LessonText>
-              A URL parameter is a variable segment of a URL path. In <code>/profile/:username</code>, the <code>:username</code> part is a parameter — it matches anything. Visit <code>/profile/alice</code> and username is "alice". Visit <code>/profile/bob</code> and it's "bob". One route, infinite unique URLs.
-            </LessonText>
-            <LessonText>
-              The <code>useParams()</code> hook reads whatever is in that segment. Call it inside any component that's rendered by a parameterised route and you get back an object with the parameter names as keys.
-            </LessonText>
-            <CodeBlock lang="jsx">{`// App.jsx — one route handles all profile URLs
-<Route path="/profile/:username" element={<ProfilePage />} />
-
-// ProfilePage.jsx — reads the parameter and fetches the right profile
-import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-
-export default function ProfilePage() {
-  const { username } = useParams()
-  const [profile, setProfile] = useState(null)
-
-  useEffect(() => {
-    async function load() {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('username', username)
-        .single()
-      setProfile(data)
-    }
-    load()
-  }, [username])
-
-  if (!profile) return <p>Profile not found.</p>
-  return <h1>{profile.display_name}</h1>
-}`}</CodeBlock>
-            <LessonText>
-              Notice that <code>username</code> is in the <code>useEffect</code> dependency array. If the user navigates directly from <code>/profile/alice</code> to <code>/profile/bob</code> without a page reload, the effect re-runs with the new username and fetches the correct profile.
-            </LessonText>
-            <LessonText>
-              The difference between a route param (<code>:username</code>) and a query string (<code>?tab=links</code>) is where in the URL they live. Route params are part of the path — they identify the resource. Query strings are optional filters or view state. For a profile page, the username is the resource identifier, so it belongs in the path.
-            </LessonText>
-            <CodeBlock lang="jsx">{`// Navigating to a profile programmatically
-import { useNavigate } from 'react-router-dom'
-
-function UsernameForm() {
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-
-  return (
-    <form onSubmit={e => { e.preventDefault(); navigate(\`/profile/\${username}\`) }}>
-      <input value={username} onChange={e => setUsername(e.target.value)} />
-      <button type="submit">View profile →</button>
-    </form>
-  )
-}`}</CodeBlock>
-            <Callout>
-              <strong>This is how every social platform works</strong> — Twitter, GitHub, LinkedIn. One component, infinite unique URLs. The component logic is the same for every profile; only the data changes based on the URL parameter.
-            </Callout>
-            <PromptCard label={PROMPTS[0].label} text={PROMPTS[0].text} tag={PROMPTS[0].technique} />
-            <ExerciseCard
-              ex={EXERCISES[0]}
-              completed={completedEx['ex1']}
-              onToggle={() => toggleExercise('ex1')}
-            />
-          </div>
-        )}
-
-        {/* ── LESSON 2: CRUD WITH SUPABASE ── */}
-        {activeLesson === 2 && (
-          <div style={{ marginBottom: 72 }}>
-            <SectionLabel text="Lesson 2 of 4" />
-            <LessonHeading main="CRUD with" accent="Supabase" />
-            <LessonText>
-              CRUD — create, read, update, delete — is the core of any data-driven app. Supabase makes all four operations straightforward. The pattern is always the same: chain <code>.from(table)</code>, specify the operation, optionally filter with <code>.eq()</code>, and destructure <code>{'{ data, error }'}</code>.
-            </LessonText>
-            <LessonText>
-              For profile data, <strong>upsert</strong> is more useful than insert. A user has exactly one profile row. If it exists, update it. If it doesn't, create it. That's what upsert does — one call handles both cases.
-            </LessonText>
-            <LessonText>
-              <strong>Optimistic updates</strong> are how you make a database-backed app feel instant. Instead of waiting for the Supabase response before updating the UI, you update the UI immediately and let the database write happen in the background. If the write fails, you silently roll back to the previous state.
-            </LessonText>
-            <CodeBlock lang="js">{`// Optimistic insert — UI updates before Supabase responds
-async function addLink({ title, url }) {
-  // 1. Create a temporary item with a fake ID
-  const temp = { id: \`temp-\${Date.now()}\`, title, url, click_count: 0 }
-
-  // 2. Append to UI immediately — no waiting
-  setLinks(prev => [...prev, temp])
-
-  // 3. Write to Supabase in the background
-  const { data, error } = await supabase
-    .from('links')
-    .insert({ title, url, user_id: userId })
-    .select()
-    .single()
-
-  if (error) {
-    // 4. Rollback — remove the optimistic item
-    setLinks(prev => prev.filter(l => l.id !== temp.id))
-    return
-  }
-
-  // 5. Replace temp item with the real row from Supabase
-  setLinks(prev => prev.map(l => l.id === temp.id ? data : l))
-}`}</CodeBlock>
-            <CodeBlock lang="js">{`// Optimistic delete with rollback
-async function deleteLink(id) {
-  // Save the item before removing it
-  const removed = links.find(l => l.id === id)
-
-  // Remove from UI immediately
-  setLinks(prev => prev.filter(l => l.id !== id))
-
-  const { error } = await supabase
-    .from('links')
-    .delete()
-    .eq('id', id)
-
-  if (error) {
-    // Rollback — re-insert the removed item
-    setLinks(prev =>
-      [...prev, removed].sort((a, b) => a.display_order - b.display_order)
-    )
-  }
-}`}</CodeBlock>
-            <Callout>
-              <strong>Optimistic updates make your app feel instant.</strong> The user never waits for a round trip. If the DB write fails, you silently restore the previous state. Most writes succeed — designing for the success path first is the right call.
-            </Callout>
-            <PromptCard label={PROMPTS[1].label} text={PROMPTS[1].text} tag={PROMPTS[1].technique} />
-            <PromptCard label={PROMPTS[3].label} text={PROMPTS[3].text} tag={PROMPTS[3].technique} />
-            <PromptCard label={PROMPTS[4].label} text={PROMPTS[4].text} tag={PROMPTS[4].technique} />
-            <ExerciseCard
-              ex={EXERCISES[1]}
-              completed={completedEx['ex2']}
-              onToggle={() => toggleExercise('ex2')}
-            />
-          </div>
-        )}
-
-        {/* ── LESSON 3: DRAG TO REORDER ── */}
-        {activeLesson === 3 && (
-          <div style={{ marginBottom: 72 }}>
-            <SectionLabel text="Lesson 3 of 4" />
-            <LessonHeading main="Drag to reorder" accent="without libraries" />
-            <LessonText>
-              The HTML5 drag-and-drop API is built into the browser. You don't need a library. The key pieces are: the <code>draggable</code> attribute on each item, and three event handlers — <code>onDragStart</code>, <code>onDragOver</code>, and <code>onDrop</code>.
-            </LessonText>
-            <LessonText>
-              The logic is two index numbers: where the drag started (<code>dragIndex</code>) and where it landed (<code>dropIndex</code>). With those two numbers you can reorder any array using a splice operation.
-            </LessonText>
-            <CodeBlock lang="jsx">{`// A draggable list — no libraries, ~30 lines
-function DraggableList({ items, onReorder }) {
-  const [dragIndex, setDragIndex] = useState(null)
-
-  function handleDrop(dropIndex) {
-    if (dragIndex === null || dragIndex === dropIndex) return
-
-    // Splice: remove from old position, insert at new position
-    const next = [...items]
-    const [moved] = next.splice(dragIndex, 1)
-    next.splice(dropIndex, 0, moved)
-
-    onReorder(next)
-    setDragIndex(null)
-  }
-
-  return (
-    <ul>
-      {items.map((item, i) => (
-        <li
-          key={item.id}
-          draggable
-          onDragStart={() => setDragIndex(i)}
-          onDragOver={e => e.preventDefault()}   // required — enables drop
-          onDrop={() => handleDrop(i)}
-          style={{ opacity: dragIndex === i ? 0.5 : 1 }}
-        >
-          ⠿ {item.title}
-        </li>
-      ))}
-    </ul>
-  )
-}`}</CodeBlock>
-            <LessonText>
-              The <code>onDragOver</code> handler must call <code>e.preventDefault()</code> — without it, the browser treats the drop target as invalid and <code>onDrop</code> never fires. This is one of the counterintuitive parts of the drag-and-drop API.
-            </LessonText>
-            <LessonText>
-              Persisting the order to Supabase is a batch update — loop through the reordered array and set <code>display_order</code> to each item's new index. On next load, <code>ORDER BY display_order</code> retrieves them in the correct sequence.
-            </LessonText>
-            <Callout>
-              <strong>Once you implement drag-and-drop from scratch once, you'll never be intimidated by it again.</strong> It's just two index numbers and an array splice. The browser handles the visual drag behaviour — you only manage the data.
-            </Callout>
-            <PromptCard label={PROMPTS[2].label} text={PROMPTS[2].text} tag={PROMPTS[2].technique} />
-            <ExerciseCard
-              ex={EXERCISES[2]}
-              completed={completedEx['ex3']}
-              onToggle={() => toggleExercise('ex3')}
-            />
-          </div>
-        )}
-
-        {/* ── LESSON 4: QR CODE ── */}
-        {activeLesson === 4 && (
-          <div style={{ marginBottom: 72 }}>
-            <SectionLabel text="Lesson 4 of 4" />
-            <LessonHeading main="Client-side" accent="QR code generation" />
-            <LessonText>
-              A QR code is a matrix of black and white squares that encodes data — in our case, a URL. Scanning it with a phone camera reads the pattern and opens the URL. The entire encoding process happens mathematically: URL string → binary data → error-correction codes → grid layout.
-            </LessonText>
-            <LessonText>
-              The <code>qrcode</code> package (npm install qrcode) handles all of that automatically. You pass it a string and a canvas element — it draws the QR code directly onto the canvas. No API call, no server, no cost.
-            </LessonText>
-            <CodeBlock lang="jsx">{`// src/components/QRCode.jsx
-import { useEffect, useRef } from 'react'
-import QRCodeLib from 'qrcode'
-
-export default function QRCode({ url }) {
-  const canvasRef = useRef(null)
-
-  useEffect(() => {
-    if (!canvasRef.current || !url) return
-    QRCodeLib.toCanvas(canvasRef.current, url, { width: 200, margin: 2 })
-  }, [url])
-
-  function download() {
-    const canvas = canvasRef.current
-    const link = document.createElement('a')
-    link.download = 'profile-qr.png'
-    link.href = canvas.toDataURL('image/png')
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
-  return (
-    <div className="qr-wrap">
-      <canvas ref={canvasRef} />
-      <button className="qr-download" onClick={download}>
-        Download PNG
-      </button>
-    </div>
-  )
-}`}</CodeBlock>
-            <LessonText>
-              The download uses the Canvas API's <code>toDataURL()</code> method, which converts the canvas pixels into a base64-encoded PNG string. You attach that string as the <code>href</code> of a temporary anchor tag, set the <code>download</code> attribute, and programmatically click it — the browser triggers a file save without any server involvement.
-            </LessonText>
-            <Callout>
-              <strong>The entire QR generation happens in the browser</strong> — no API call, no server, no cost. The canvas API lets you export it as a PNG instantly. This is a general pattern: canvas → toDataURL() → download link. It works for charts, screenshots, and any canvas-rendered content.
-            </Callout>
-            <PromptCard label={PROMPTS[5].label} text={PROMPTS[5].text} tag={PROMPTS[5].technique} />
-            <ExerciseCard
-              ex={EXERCISES[3]}
-              completed={completedEx['ex4']}
-              onToggle={() => toggleExercise('ex4')}
-            />
-          </div>
-        )}
       </div>
 
       {/* PROJECT BRIEF */}
@@ -1200,7 +904,9 @@ export default function QRCode({ url }) {
       <div className="challenge-section">
         <div className="section-label">Step-by-step build guide</div>
         <div className="build-guide">
-          {BUILD_STEPS.map(step => (
+
+          {/* ── Steps 01–03: Scaffold, Supabase setup, useProfile ── */}
+          {BUILD_STEPS.slice(0, 3).map(step => (
             <div key={step.num} className="build-step">
               <div className="build-step-header">
                 <span className="build-step-num">{step.num}</span>
@@ -1215,6 +921,374 @@ export default function QRCode({ url }) {
               </div>
             </div>
           ))}
+
+          {/* ── Step 04: ProfilePage — Dynamic routing concept ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">04</span>
+              <span className="build-step-title">{BUILD_STEPS[3].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[3].desc}</p>
+
+            <SectionLabel text="// concept: dynamic routing" />
+            <LessonHeading main="Dynamic routing with" accent="React Router" />
+            <LessonText>
+              A URL parameter is a variable segment of a URL path. In <code>/profile/:username</code>, the <code>:username</code> part is a parameter — it matches anything. Visit <code>/profile/alice</code> and username is "alice". Visit <code>/profile/bob</code> and it's "bob". One route, infinite unique URLs.
+            </LessonText>
+            <LessonText>
+              The <code>useParams()</code> hook reads whatever is in that segment. Call it inside any component that's rendered by a parameterised route and you get back an object with the parameter names as keys.
+            </LessonText>
+            <CodeBlock lang="jsx">{`// App.jsx — one route handles all profile URLs
+<Route path="/profile/:username" element={<ProfilePage />} />
+
+// ProfilePage.jsx — reads the parameter and fetches the right profile
+import { useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+export default function ProfilePage() {
+  const { username } = useParams()
+  const [profile, setProfile] = useState(null)
+
+  useEffect(() => {
+    async function load() {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('username', username)
+        .single()
+      setProfile(data)
+    }
+    load()
+  }, [username])
+
+  if (!profile) return <p>Profile not found.</p>
+  return <h1>{profile.display_name}</h1>
+}`}</CodeBlock>
+            <LessonText>
+              Notice that <code>username</code> is in the <code>useEffect</code> dependency array. If the user navigates directly from <code>/profile/alice</code> to <code>/profile/bob</code> without a page reload, the effect re-runs with the new username and fetches the correct profile.
+            </LessonText>
+            <LessonText>
+              The difference between a route param (<code>:username</code>) and a query string (<code>?tab=links</code>) is where in the URL they live. Route params are part of the path — they identify the resource. Query strings are optional filters or view state. For a profile page, the username is the resource identifier, so it belongs in the path.
+            </LessonText>
+            <CodeBlock lang="jsx">{`// Navigating to a profile programmatically
+import { useNavigate } from 'react-router-dom'
+
+function UsernameForm() {
+  const navigate = useNavigate()
+  const [username, setUsername] = useState('')
+
+  return (
+    <form onSubmit={e => { e.preventDefault(); navigate(\`/profile/\${username}\`) }}>
+      <input value={username} onChange={e => setUsername(e.target.value)} />
+      <button type="submit">View profile →</button>
+    </form>
+  )
+}`}</CodeBlock>
+            <Callout>
+              <strong>This is how every social platform works</strong> — Twitter, GitHub, LinkedIn. One component, infinite unique URLs. The component logic is the same for every profile; only the data changes based on the URL parameter.
+            </Callout>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[3].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[0].label} text={PROMPTS[0].text} tag={PROMPTS[0].technique} />
+            <ExerciseCard
+              ex={EXERCISES[0]}
+              completed={completedEx['ex1']}
+              onToggle={() => toggleExercise('ex1')}
+            />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[3].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Step 05: ProfileHeader — theme prompt ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">05</span>
+              <span className="build-step-title">{BUILD_STEPS[4].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[4].desc}</p>
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[4].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[4].label} text={PROMPTS[4].text} tag={PROMPTS[4].technique} />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[4].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Step 06: LinkItem — click tracking prompt ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">06</span>
+              <span className="build-step-title">{BUILD_STEPS[5].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[5].desc}</p>
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[5].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[3].label} text={PROMPTS[3].text} tag={PROMPTS[3].technique} />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[5].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Step 07: QRCode — QR code concept ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">07</span>
+              <span className="build-step-title">{BUILD_STEPS[6].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[6].desc}</p>
+
+            <SectionLabel text="// concept: client-side QR code" />
+            <LessonHeading main="Client-side" accent="QR code generation" />
+            <LessonText>
+              A QR code is a matrix of black and white squares that encodes data — in our case, a URL. Scanning it with a phone camera reads the pattern and opens the URL. The entire encoding process happens mathematically: URL string → binary data → error-correction codes → grid layout.
+            </LessonText>
+            <LessonText>
+              The <code>qrcode</code> package (npm install qrcode) handles all of that automatically. You pass it a string and a canvas element — it draws the QR code directly onto the canvas. No API call, no server, no cost.
+            </LessonText>
+            <CodeBlock lang="jsx">{`// src/components/QRCode.jsx
+import { useEffect, useRef } from 'react'
+import QRCodeLib from 'qrcode'
+
+export default function QRCode({ url }) {
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    if (!canvasRef.current || !url) return
+    QRCodeLib.toCanvas(canvasRef.current, url, { width: 200, margin: 2 })
+  }, [url])
+
+  function download() {
+    const canvas = canvasRef.current
+    const link = document.createElement('a')
+    link.download = 'profile-qr.png'
+    link.href = canvas.toDataURL('image/png')
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  return (
+    <div className="qr-wrap">
+      <canvas ref={canvasRef} />
+      <button className="qr-download" onClick={download}>
+        Download PNG
+      </button>
+    </div>
+  )
+}`}</CodeBlock>
+            <LessonText>
+              The download uses the Canvas API's <code>toDataURL()</code> method, which converts the canvas pixels into a base64-encoded PNG string. You attach that string as the <code>href</code> of a temporary anchor tag, set the <code>download</code> attribute, and programmatically click it — the browser triggers a file save without any server involvement.
+            </LessonText>
+            <Callout>
+              <strong>The entire QR generation happens in the browser</strong> — no API call, no server, no cost. The canvas API lets you export it as a PNG instantly. This is a general pattern: canvas → toDataURL() → download link. It works for charts, screenshots, and any canvas-rendered content.
+            </Callout>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[6].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[5].label} text={PROMPTS[5].text} tag={PROMPTS[5].technique} />
+            <ExerciseCard
+              ex={EXERCISES[3]}
+              completed={completedEx['ex4']}
+              onToggle={() => toggleExercise('ex4')}
+            />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[6].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Steps 08–09: Dashboard, ProfileEditor ── */}
+          {[BUILD_STEPS[7], BUILD_STEPS[8]].map(step => (
+            <div key={step.num} className="build-step">
+              <div className="build-step-header">
+                <span className="build-step-num">{step.num}</span>
+                <span className="build-step-title">{step.title}</span>
+              </div>
+              <p className="build-step-desc">{step.desc}</p>
+              <div className="build-step-prompt-label">// claude code prompt</div>
+              <CodeBlock lang="prompt">{step.prompt}</CodeBlock>
+              <div className="build-step-done">
+                <span className="step-badge">Done when</span>
+                <span>{step.doneWhen}</span>
+              </div>
+            </div>
+          ))}
+
+          {/* ── Step 10: useLinks — CRUD with Supabase concept ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">10</span>
+              <span className="build-step-title">{BUILD_STEPS[9].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[9].desc}</p>
+
+            <SectionLabel text="// concept: CRUD with optimistic updates" />
+            <LessonHeading main="CRUD with" accent="Supabase" />
+            <LessonText>
+              CRUD — create, read, update, delete — is the core of any data-driven app. Supabase makes all four operations straightforward. The pattern is always the same: chain <code>.from(table)</code>, specify the operation, optionally filter with <code>.eq()</code>, and destructure <code>{'{ data, error }'}</code>.
+            </LessonText>
+            <LessonText>
+              For profile data, <strong>upsert</strong> is more useful than insert. A user has exactly one profile row. If it exists, update it. If it doesn't, create it. That's what upsert does — one call handles both cases.
+            </LessonText>
+            <LessonText>
+              <strong>Optimistic updates</strong> are how you make a database-backed app feel instant. Instead of waiting for the Supabase response before updating the UI, you update the UI immediately and let the database write happen in the background. If the write fails, you silently roll back to the previous state.
+            </LessonText>
+            <CodeBlock lang="js">{`// Optimistic insert — UI updates before Supabase responds
+async function addLink({ title, url }) {
+  // 1. Create a temporary item with a fake ID
+  const temp = { id: \`temp-\${Date.now()}\`, title, url, click_count: 0 }
+
+  // 2. Append to UI immediately — no waiting
+  setLinks(prev => [...prev, temp])
+
+  // 3. Write to Supabase in the background
+  const { data, error } = await supabase
+    .from('links')
+    .insert({ title, url, user_id: userId })
+    .select()
+    .single()
+
+  if (error) {
+    // 4. Rollback — remove the optimistic item
+    setLinks(prev => prev.filter(l => l.id !== temp.id))
+    return
+  }
+
+  // 5. Replace temp item with the real row from Supabase
+  setLinks(prev => prev.map(l => l.id === temp.id ? data : l))
+}`}</CodeBlock>
+            <CodeBlock lang="js">{`// Optimistic delete with rollback
+async function deleteLink(id) {
+  // Save the item before removing it
+  const removed = links.find(l => l.id === id)
+
+  // Remove from UI immediately
+  setLinks(prev => prev.filter(l => l.id !== id))
+
+  const { error } = await supabase
+    .from('links')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    // Rollback — re-insert the removed item
+    setLinks(prev =>
+      [...prev, removed].sort((a, b) => a.display_order - b.display_order)
+    )
+  }
+}`}</CodeBlock>
+            <Callout>
+              <strong>Optimistic updates make your app feel instant.</strong> The user never waits for a round trip. If the DB write fails, you silently restore the previous state. Most writes succeed — designing for the success path first is the right call.
+            </Callout>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[9].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[1].label} text={PROMPTS[1].text} tag={PROMPTS[1].technique} />
+            <ExerciseCard
+              ex={EXERCISES[1]}
+              completed={completedEx['ex2']}
+              onToggle={() => toggleExercise('ex2')}
+            />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[9].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Step 11: DraggableLinkItem — drag-to-reorder concept ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">11</span>
+              <span className="build-step-title">{BUILD_STEPS[10].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[10].desc}</p>
+
+            <SectionLabel text="// concept: drag to reorder" />
+            <LessonHeading main="Drag to reorder" accent="without libraries" />
+            <LessonText>
+              The HTML5 drag-and-drop API is built into the browser. You don't need a library. The key pieces are: the <code>draggable</code> attribute on each item, and three event handlers — <code>onDragStart</code>, <code>onDragOver</code>, and <code>onDrop</code>.
+            </LessonText>
+            <LessonText>
+              The logic is two index numbers: where the drag started (<code>dragIndex</code>) and where it landed (<code>dropIndex</code>). With those two numbers you can reorder any array using a splice operation.
+            </LessonText>
+            <CodeBlock lang="jsx">{`// A draggable list — no libraries, ~30 lines
+function DraggableList({ items, onReorder }) {
+  const [dragIndex, setDragIndex] = useState(null)
+
+  function handleDrop(dropIndex) {
+    if (dragIndex === null || dragIndex === dropIndex) return
+
+    // Splice: remove from old position, insert at new position
+    const next = [...items]
+    const [moved] = next.splice(dragIndex, 1)
+    next.splice(dropIndex, 0, moved)
+
+    onReorder(next)
+    setDragIndex(null)
+  }
+
+  return (
+    <ul>
+      {items.map((item, i) => (
+        <li
+          key={item.id}
+          draggable
+          onDragStart={() => setDragIndex(i)}
+          onDragOver={e => e.preventDefault()}   // required — enables drop
+          onDrop={() => handleDrop(i)}
+          style={{ opacity: dragIndex === i ? 0.5 : 1 }}
+        >
+          ⠿ {item.title}
+        </li>
+      ))}
+    </ul>
+  )
+}`}</CodeBlock>
+            <LessonText>
+              The <code>onDragOver</code> handler must call <code>e.preventDefault()</code> — without it, the browser treats the drop target as invalid and <code>onDrop</code> never fires. This is one of the counterintuitive parts of the drag-and-drop API.
+            </LessonText>
+            <LessonText>
+              Persisting the order to Supabase is a batch update — loop through the reordered array and set <code>display_order</code> to each item's new index. On next load, <code>ORDER BY display_order</code> retrieves them in the correct sequence.
+            </LessonText>
+            <Callout>
+              <strong>Once you implement drag-and-drop from scratch once, you'll never be intimidated by it again.</strong> It's just two index numbers and an array splice. The browser handles the visual drag behaviour — you only manage the data.
+            </Callout>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[10].prompt}</CodeBlock>
+            <PromptCard label={PROMPTS[2].label} text={PROMPTS[2].text} tag={PROMPTS[2].technique} />
+            <ExerciseCard
+              ex={EXERCISES[2]}
+              completed={completedEx['ex3']}
+              onToggle={() => toggleExercise('ex3')}
+            />
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[10].doneWhen}</span>
+            </div>
+          </div>
+
+          {/* ── Step 12: StatsPanel ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">12</span>
+              <span className="build-step-title">{BUILD_STEPS[11].title}</span>
+            </div>
+            <p className="build-step-desc">{BUILD_STEPS[11].desc}</p>
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{BUILD_STEPS[11].prompt}</CodeBlock>
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>{BUILD_STEPS[11].doneWhen}</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
