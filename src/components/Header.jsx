@@ -24,6 +24,8 @@ export default function Header({ variant = 'home' }) {
           <NavLink to="/module/4">04 API</NavLink>
           <NavLink to="/module/5">05 Quiz App</NavLink>
           <NavLink to="/module/6">06 Link-in-Bio</NavLink>
+          <NavLink to="/module/7">07 Cloudflare</NavLink>
+          <NavLink to="/showcase">Showcase</NavLink>
         </nav>
       )}
 

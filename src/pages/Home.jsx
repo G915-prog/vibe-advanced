@@ -45,7 +45,7 @@ const MODULES = [
     tags: ['Dynamic routes', 'Profiles', 'Click tracking'],
   },
   {
-    id: 7, num: '07 — deploy', to: '#',
+    id: 7, num: '07 — deploy', to: '/module/7',
     title: 'Cloudflare\nHosting',
     desc: 'Pages, Workers, edge functions, custom domains. Deploy fast. Ship to the world for free.',
     tags: ['CF Pages', 'Workers', 'Custom domain'],

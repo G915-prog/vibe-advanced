@@ -9,6 +9,8 @@ import Module3 from './pages/Module3'
 import Module4 from './pages/Module4'
 import Module5 from './pages/Module5'
 import Module6 from './pages/Module6'
+import Module7 from './pages/Module7'
+import Showcase from './pages/Showcase'
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
           <Route path="/module/4" element={<ProtectedRoute><Module4 /></ProtectedRoute>} />
           <Route path="/module/5" element={<ProtectedRoute><Module5 /></ProtectedRoute>} />
           <Route path="/module/6" element={<ProtectedRoute><Module6 /></ProtectedRoute>} />
+          <Route path="/module/7" element={<ProtectedRoute><Module7 /></ProtectedRoute>} />
+          <Route path="/showcase" element={<ProtectedRoute><Showcase /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

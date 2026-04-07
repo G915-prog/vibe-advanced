@@ -5,6 +5,13 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v7.0.0 — 2026-04-07 — Module 7: Cloudflare Hosting
+- Created `src/pages/Module7.jsx` — single-scroll deployment guide; sections: hero (Module 07, 6–8 hrs, Intermediate, Cloudflare Pages + Workers + React), objectives, project overview (2 deliverables: vibe-hub + /showcase), 14-step build guide with embedded lessons at first point of need (CF vs Vercel comparison table → step 01, portfolio hub design → step 02, build config + _redirects → step 03, env var auto-redeploy gotcha → step 04, Workers + V8 isolates concept → step 05, outbound fetch + HEAD requests + Promise.all → step 06, wrangler.toml + secrets → step 07, CORS concept → step 09, DNS + SSL → step 10, edge caching + Lighthouse → step 11, migration process → step 12), 14-item deployment checklist (localStorage `vibe-m7-deploy`), 8-criterion self-assessment rubric (localStorage `vibe-m7-rubric`), 6 prompt templates, Module 08 capstone teaser, bottom nav; calls `markComplete(7)` when all 14 deploy items are checked
+- Created `src/pages/Showcase.jsx` — placeholder page; built out in Module 7 Step 8; includes hero, placeholder message linking to /module/7, and ModuleNav
+- `App.jsx` — added `/module/7` route (ProtectedRoute + Module7) and `/showcase` route (ProtectedRoute + Showcase); imported both components
+- `Home.jsx` — Module 7 card (`id: 7`) updated from `'#'` to `'/module/7'`
+- `Header.jsx` — added `07 Cloudflare` NavLink to `/module/7` and `Showcase` NavLink to `/showcase`
+
 ### v6.0.2 — 2026-04-06 — Module 6: restructure lessons into build guide
 - `src/pages/Module6.jsx` — removed standalone 4-tab lesson section; lessons now live inline within the build step where their concept is first needed: dynamic routing concept → step 04 (ProfilePage), QR code concept → step 07 (QRCode component), CRUD + optimistic updates concept → step 10 (useLinks hook), drag-to-reorder concept → step 11 (DraggableLinkItem); PromptCards follow the same placement (theme → step 05, click tracking → step 06); ExerciseCards appear immediately after their relevant step; removed `activeLesson` state and `lessonTitles` array; project brief, component architecture, and Supabase schema sections remain before the build guide
 
