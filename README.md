@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v7.0.1 — 2026-04-08 — Optimistic progress ring on Home
+- `useProgress.js` — seeds `rows` from `localStorage('vibe-progress-cache')` on mount so the ProgressRing shows instantly on page load; overwrites cache after every successful Supabase fetch (stale-while-revalidate pattern)
+
 ### v7.0.0 — 2026-04-07 — Module 7: Cloudflare Hosting
 - Created `src/pages/Module7.jsx` — single-scroll deployment guide; sections: hero (Module 07, 6–8 hrs, Intermediate, Cloudflare Pages + Workers + React), objectives, project overview (2 deliverables: vibe-hub + /showcase), 14-step build guide with embedded lessons at first point of need (CF vs Vercel comparison table → step 01, portfolio hub design → step 02, build config + _redirects → step 03, env var auto-redeploy gotcha → step 04, Workers + V8 isolates concept → step 05, outbound fetch + HEAD requests + Promise.all → step 06, wrangler.toml + secrets → step 07, CORS concept → step 09, DNS + SSL → step 10, edge caching + Lighthouse → step 11, migration process → step 12), 14-item deployment checklist (localStorage `vibe-m7-deploy`), 8-criterion self-assessment rubric (localStorage `vibe-m7-rubric`), 6 prompt templates, Module 08 capstone teaser, bottom nav; calls `markComplete(7)` when all 14 deploy items are checked
 - Created `src/pages/Showcase.jsx` — placeholder page; built out in Module 7 Step 8; includes hero, placeholder message linking to /module/7, and ModuleNav

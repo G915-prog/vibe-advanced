@@ -15,7 +15,10 @@ import { supabase } from '../lib/supabase'
  * version produced, so existing components need no changes.
  */
 export function useProgress() {
-  const [rows, setRows] = useState([])       // raw rows from Supabase
+  const [rows, setRows] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('vibe-progress-cache') ?? 'null') ?? [] }
+    catch { return [] }
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const channelRef = useRef(null)
@@ -55,6 +58,7 @@ export function useProgress() {
         setError(fetchError.message)
       } else {
         setRows(data ?? [])
+        try { localStorage.setItem('vibe-progress-cache', JSON.stringify(data ?? [])) } catch {}
       }
       setLoading(false)
     }
