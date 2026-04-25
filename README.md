@@ -5,6 +5,12 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v7.1.0 — 2026-04-25 — Password reset flow
+- `src/pages/ForgotPassword.jsx` — new page; email input calls `supabase.auth.resetPasswordForEmail` with `redirectTo: https://vibe-advanced.vercel.app/reset-password`; shows success/error messages; links back to `/login`
+- `src/pages/ResetPassword.jsx` — new page; checks session on mount (redirects to `/forgot-password` if invalid token); validates password match; calls `supabase.auth.updateUser({ password })`; shows success then redirects to `/` after 2 s
+- `App.jsx` — added `/forgot-password` and `/reset-password` public routes; imported both components
+- `Login.jsx` — added "Forgot password?" link above form actions, navigates to `/forgot-password`
+
 ### v7.0.1 — 2026-04-08 — Optimistic progress ring on Home
 - `useProgress.js` — seeds `rows` from `localStorage('vibe-progress-cache')` on mount so the ProgressRing shows instantly on page load; overwrites cache after every successful Supabase fetch (stale-while-revalidate pattern)
 

@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import Login from './pages/Login'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Module1 from './pages/Module1'
 import Module2 from './pages/Module2'
 import Module3 from './pages/Module3'
@@ -19,6 +21,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/module/1" element={<ProtectedRoute><Module1 /></ProtectedRoute>} />
           <Route path="/module/2" element={<ProtectedRoute><Module2 /></ProtectedRoute>} />
           <Route path="/module/3" element={<ProtectedRoute><Module3 /></ProtectedRoute>} />

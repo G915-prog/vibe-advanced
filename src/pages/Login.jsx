@@ -92,6 +92,12 @@ export default function Login() {
           {error && <div className="auth-error">{error}</div>}
           {message && <div className="auth-message">{message}</div>}
 
+          <div style={{ textAlign: 'right' }}>
+            <Link to="/forgot-password" style={{ fontSize: '11px', fontFamily: 'var(--mono)', color: 'var(--muted)', textDecoration: 'none' }}>
+              Forgot password?
+            </Link>
+          </div>
+
           <div className="form-actions">
             <button
               type="submit"
