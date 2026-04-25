@@ -5,6 +5,9 @@ Advanced vibecoding course
 
 ## Changelog
 
+### v7.2.2 — 2026-04-25 — Module 7: detailed manual walkthroughs for 7 steps
+- `src/pages/Module7.jsx` — replaced vague descriptions with step-by-step manual walkthroughs for: Step 06 (Deploy the Worker — wrangler deploy output, testing, error diagnosis); Step 08 (added VITE_WORKER_URL Vercel env var setup before the CORS concept); Step 10 (Custom domain — Option A Cloudflare / Option B external registrar, HTTPS verification); Step 11 (Performance audit — Lighthouse walkthrough in Chrome DevTools with common fixes); Step 12 (Migrate Counter App — restructured into Part A Claude prompt in counter repo, Part B manual Cloudflare Pages deploy, Part C Claude prompt in vibe-hub); Step 13 (Migrate Tip Calculator — same three-part structure); Step 16 (Final checks — combined verify-the-full-architecture checkbox list with React Router and status-dot tests, plus ordered redeploy sequence for all three deployments); all lists use inline flex-column styles to avoid obj-list layout bug
+
 ### v7.2.1 — 2026-04-25 — Module 7 Step 02: manual deploy walkthrough
 - `src/pages/Module7.jsx` — Step 02 "Deploy vibe-hub to Cloudflare Pages" replaced with a fully detailed manual walkthrough: 7 numbered steps covering Cloudflare dashboard navigation, GitHub app install, repository selection, exact build settings (project name, production branch, framework preset None, build command, output dir dist), first deploy trigger, and URL verification; added warning callout for the "accidentally created a Worker" gotcha with recovery instructions; removed the concept block, _redirects code snippet, and Claude Code prompt that were previously in this step
 

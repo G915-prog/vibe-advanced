@@ -1115,9 +1115,38 @@ export default function Module7() {
               <span className="build-step-title">Deploy the Worker to production</span>
             </div>
             <p className="build-step-desc">
-              Deploy with <code>wrangler deploy</code>. Test the live workers.dev URL. Save the
-              URL — you'll need it for the next three steps.
+              Run <code>wrangler deploy</code> from your terminal, test the live URL, and save it —
+              you will need it in the next three steps.
             </p>
+
+            <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                In your terminal, navigate to the vibe-status-worker folder:<br />
+                <code>cd path/to/vibe-status-worker</code>
+              </li>
+              <li>
+                Run: <code>wrangler deploy</code><br />
+                Output will show something like:<br />
+                <code>Uploaded vibe-status-worker (1.23 sec)</code><br />
+                <code>Published vibe-status-worker (0.42 sec)</code><br />
+                <code>https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev</code>
+              </li>
+              <li>Copy the <code>workers.dev</code> URL from the output</li>
+              <li>
+                Test it immediately — open the URL in your browser. You should see JSON like:<br />
+                <code>{'{"quiz":"online","vibe-advanced":"online",...}'}</code><br />
+                Or test with curl: <code>curl https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev/status</code>
+              </li>
+              <li>
+                If you see an error instead of JSON:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>"No route matched"</strong> → check your Worker handles GET /status</li>
+                  <li><strong>"Internal error"</strong> → run <code>wrangler tail</code> in a second terminal to see live logs while you hit the URL again</li>
+                  <li><strong>CORS error in browser</strong> → check your Worker sets <code>Access-Control-Allow-Origin: *</code> in the response headers</li>
+                </ul>
+              </li>
+              <li>Save the workers.dev URL — you will need it in the next step for <code>VITE_WORKER_URL</code> in both vibe-hub and vibe-advanced</li>
+            </ol>
 
             <SectionLabel text="// concept: wrangler.toml" />
             <LessonHeading main="wrangler.toml:" accent="your Worker's config file." />
@@ -1177,10 +1206,39 @@ export default function Module7() {
               <span className="build-step-title">Connect the status Worker to the Showcase</span>
             </div>
             <p className="build-step-desc">
-              Call the live Worker endpoint from Showcase.jsx on mount. Display a coloured status
-              dot on each project card: green for online, red for offline, grey while checking.
-              Handle loading and error states.
+              First set <code>VITE_WORKER_URL</code> in the Vercel dashboard, then use the Claude
+              Code prompt below to wire the live Worker into the Showcase.
             </p>
+
+            <SectionLabel text="// manual: add VITE_WORKER_URL to Vercel" />
+            <LessonHeading main="Set the env var" accent="before writing any code." />
+            <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                Go to <strong>vercel.com</strong> → click your <strong>vibe-advanced</strong> project
+                → click the <strong>"Settings"</strong> tab → click <strong>"Environment Variables"</strong> in the left sidebar
+              </li>
+              <li>
+                Add the following variable:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Key:</strong> VITE_WORKER_URL</li>
+                  <li><strong>Value:</strong> [paste your workers.dev URL from Step 6]</li>
+                  <li><strong>Environment:</strong> Production + Preview + Development (check all three)</li>
+                </ul>
+                Click <strong>"Save"</strong>
+              </li>
+              <li>
+                Trigger a manual redeploy to pick up the new env var:
+                go to the <strong>"Deployments"</strong> tab → find the latest deployment →
+                click the three-dot menu → <strong>"Redeploy"</strong> → confirm
+              </li>
+              <li>Wait for the build to complete (~1–2 minutes)</li>
+              <li>
+                If status dots are still grey after redeploy: open DevTools → Console and look for
+                a fetch error. Most likely cause: <code>VITE_WORKER_URL</code> is <code>undefined</code>
+                — check Settings → Environment Variables and confirm the name is spelled exactly
+                as <code>VITE_WORKER_URL</code>
+              </li>
+            </ol>
 
             <SectionLabel text="// concept: cors in practice" />
             <LessonHeading main="Why CORS exists" accent="and when it matters." />
@@ -1234,9 +1292,8 @@ export default function Module7() {
               <span className="build-step-title">Custom domain setup</span>
             </div>
             <p className="build-step-desc">
-              Connect a custom domain to your vibe-hub Cloudflare Pages deployment. This is manual
-              dashboard work — no Claude Code prompt. If you don't own a domain, the .pages.dev
-              subdomain is already HTTPS-enabled and counts as done.
+              Manual dashboard work only — no Claude Code prompt needed. If you don't own a domain,
+              your pages.dev URL is permanent and free. Skip intentionally or follow the walkthrough below.
             </p>
 
             <SectionLabel text="// concept: dns, domains, and ssl" />
@@ -1253,26 +1310,50 @@ export default function Module7() {
               is added automatically and takes effect in seconds. SSL is also provisioned
               automatically via Let's Encrypt — you never touch a certificate file.
             </LessonText>
+
             <Callout>
-              <strong>Don't own a domain?</strong> Your .pages.dev URL already has HTTPS by
-              default — it's a valid completion for this step. If you want your own domain, a
-              .xyz domain often costs ~$1/year and gives you full DNS control.
+              <strong>Don't own a domain?</strong> Your .pages.dev URL is permanent, free, and completely
+              valid. Skip this step entirely — pages.dev is not a temporary URL.
             </Callout>
 
             <SectionLabel text="// walkthrough: connect a custom domain" />
-            <ol className="obj-list" style={{ paddingLeft: 20 }}>
-              <li>Cloudflare Pages → vibe-hub → Custom domains → Add a custom domain</li>
-              <li>Enter your domain (e.g. projects.yourdomain.com) → Continue</li>
-              <li>If using Cloudflare DNS: CNAME record is added automatically</li>
-              <li>If using another DNS provider: manually add the CNAME record shown</li>
-              <li>Wait for DNS propagation (seconds on Cloudflare DNS, up to 24h elsewhere)</li>
-              <li>Cloudflare provisions an SSL certificate automatically</li>
-              <li>Visit your domain — the green padlock confirms HTTPS is active</li>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)', marginBottom: 10 }}>
+              OPTION A — Domain registered with Cloudflare (easiest):
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>dash.cloudflare.com → Workers &amp; Pages → vibe-hub → <strong>Custom domains</strong> tab → <strong>Add a custom domain</strong></li>
+              <li>Type your domain or subdomain (e.g. hub.yourdomain.com)</li>
+              <li>Click <strong>Continue</strong> — Cloudflare adds the DNS record automatically</li>
+              <li>SSL certificate is issued automatically within ~1 minute</li>
+              <li>Done — your domain is live</li>
             </ol>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)', marginBottom: 10 }}>
+              OPTION B — Domain registered elsewhere (GoDaddy, Namecheap etc):
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>dash.cloudflare.com → Workers &amp; Pages → vibe-hub → <strong>Custom domains</strong> tab → <strong>Add a custom domain</strong></li>
+              <li>Type your domain → Continue</li>
+              <li>
+                Cloudflare shows you a CNAME record to add:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Name:</strong> hub (or @ for root domain)</li>
+                  <li><strong>Value:</strong> vibe-hub.pages.dev</li>
+                </ul>
+              </li>
+              <li>Log into your domain registrar → find DNS settings → add the CNAME record Cloudflare showed you</li>
+              <li>Back in Cloudflare — click <strong>Activate domain</strong></li>
+              <li>DNS propagation takes 1–48 hours (usually under 30 minutes)</li>
+              <li>SSL certificate is issued automatically once DNS propagates</li>
+            </ol>
+            <Callout>
+              <strong>How to confirm it's working:</strong> Visit your domain in the browser. You should
+              see vibe-hub with a padlock (HTTPS) in the address bar. If you see a security warning,
+              SSL is still being issued — wait 10 minutes and retry.
+            </Callout>
 
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>vibe-hub is accessible at a custom domain or .pages.dev URL with a valid HTTPS certificate (green padlock in the browser address bar).</span>
+              <span>vibe-hub loads at your custom domain with valid HTTPS, OR you have confirmed you are happy with the pages.dev URL and skipped this step intentionally.</span>
             </div>
           </div>
 
@@ -1283,10 +1364,32 @@ export default function Module7() {
               <span className="build-step-title">Performance audit</span>
             </div>
             <p className="build-step-desc">
-              Run Lighthouse on both live sites. Add a cache-control header to the Worker response.
-              Both sites should score 90+ on Performance — Cloudflare's edge caching gives
-              vibe-hub a significant head start.
+              Run Lighthouse on both live sites. Both should score 90+ on Performance — Cloudflare's
+              edge caching gives vibe-hub a significant head start.
             </p>
+
+            <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                Open your live vibe-hub Cloudflare URL in Chrome → open DevTools (F12) → click the
+                <strong>"Lighthouse"</strong> tab → check <strong>Performance</strong> and <strong>Best Practices</strong> only
+                (uncheck others to keep it fast) → click <strong>"Analyze page load"</strong> → wait ~30 seconds
+              </li>
+              <li>
+                Note your Performance score. Target is 90+.
+                Common fixes if below 90:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Images not optimised</strong> → use WebP format, add width/height attributes</li>
+                  <li><strong>Unused JavaScript</strong> → use the Claude Code prompt below</li>
+                  <li><strong>No caching headers</strong> → Cloudflare handles this automatically for Pages deployments, nothing to do</li>
+                </ul>
+              </li>
+              <li>Repeat for <strong>vibe-advanced.vercel.app</strong> in a new Chrome tab</li>
+              <li>
+                If either site scores below 90, use the Claude Code prompt below — paste in the
+                Lighthouse opportunities list to get targeted fixes
+              </li>
+              <li>Push the fix, wait for redeploy, run Lighthouse again</li>
+            </ol>
 
             <SectionLabel text="// concept: cloudflare edge caching and lighthouse" />
             <LessonHeading main="The edge network" accent="is your CDN." />
@@ -1320,31 +1423,73 @@ export default function Module7() {
               <span className="build-step-title">Migrate the Counter App from Vercel to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              The Counter App is the simplest project — no backend, no env vars. Connect its
-              GitHub repo to Cloudflare Pages. Confirm it works identically at the new URL.
+              Three-part process: prepare the repo, deploy manually via the Cloudflare dashboard,
+              then update the project URL in vibe-hub.
             </p>
 
             <SectionLabel text="// concept: the migration process" />
             <LessonHeading main="Migration is just" accent="reconnecting the repo." />
             <LessonText>
               Moving an app from Vercel to Cloudflare Pages doesn't require changing any code —
-              you're connecting the same GitHub repo to a different host. Both platforms read the
-              same branch and run the same build command. The gotchas are in configuration
-              differences: Vercel uses <code>vercel.json</code> for redirects; Cloudflare uses a{' '}
-              <code>_redirects</code> file. Vercel auto-injects environment variables like{' '}
-              <code>VERCEL_URL</code>; Cloudflare doesn't have those.
-            </LessonText>
-            <LessonText>
-              You don't need to take down the Vercel deployment after migrating — you can run
-              both simultaneously. The old Vercel URL still works; it's just no longer the
-              canonical one. Update the URL in projects.js (Step 14) after both migrations are done.
+              you're connecting the same GitHub repo to a different host. The gotchas are in
+              configuration differences: Vercel uses <code>vercel.json</code> for redirects;
+              Cloudflare uses a <code>_redirects</code> file. You don't need to take down the
+              Vercel deployment — you can run both simultaneously.
             </LessonText>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['12']}</CodeBlock>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part A — Prepare the repo
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Run this Claude Code prompt <strong>in the counter app repo</strong> — not vibe-hub, not vibe-advanced:
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in counter-app repo</div>
+            <CodeBlock lang="prompt">{`Check this project for the following and fix any issues:
+1. Delete vercel.json if it exists
+2. Check if React Router is used anywhere — if yes, create public/_redirects containing exactly: /* /index.html 200
+3. Check .env files — remove any values that reference vercel.app URLs
+4. Run npm run build and confirm it completes with no errors
+5. List every file you changed`}</CodeBlock>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part B — Push and deploy (manual)
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>Commit any changes Claude Code made and push to GitHub</li>
+              <li>
+                Go to <strong>dash.cloudflare.com</strong> → Workers &amp; Pages → Pages tab
+                → click <strong>"Create a project"</strong> → <strong>"Connect to Git"</strong>
+              </li>
+              <li>Find your counter app repo in the list → click <strong>"Begin setup"</strong></li>
+              <li>
+                Configure build settings:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Project name:</strong> counter-app (or your preferred name)</li>
+                  <li><strong>Production branch:</strong> main</li>
+                  <li><strong>Framework preset:</strong> None</li>
+                  <li><strong>Build command:</strong> npm run build</li>
+                  <li><strong>Build output directory:</strong> dist</li>
+                </ul>
+                Click <strong>"Save and Deploy"</strong>
+              </li>
+              <li>
+                When deployment completes, click the live pages.dev URL and test — navigate to a
+                non-root route if any exist, refresh the page, confirm no 404
+              </li>
+            </ol>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part C — Update vibe-hub
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Run this Claude Code prompt <strong>in vibe-hub</strong>:
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-hub</div>
+            <CodeBlock lang="prompt">{`In src/data/projects.js, find the counter app entry and update its url to [paste your new Cloudflare pages.dev URL]. Update its host field to 'cloudflare'. Commit and push.`}</CodeBlock>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The Counter App is live at a .pages.dev URL. Counter increments and resets correctly. Note the URL for Step 14.</span>
+              <span>Counter App is live on Cloudflare Pages, vibe-hub card links to the new URL, and host badge shows Cloudflare.</span>
             </div>
           </div>
 
@@ -1355,16 +1500,59 @@ export default function Module7() {
               <span className="build-step-title">Migrate the Tip Calculator from Vercel to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              Same process as the Counter App — connect the tip-calculator GitHub repo to
-              Cloudflare Pages. No code changes needed. Confirm the calculator works correctly
-              at the new URL.
+              Same three-part process as the counter app migration — apply identically to the tip calculator repo.
             </p>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['13']}</CodeBlock>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part A — Prepare the repo
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Run this Claude Code prompt <strong>in the tip calculator repo</strong>:
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in tip-calculator repo</div>
+            <CodeBlock lang="prompt">{`Check this project for the following and fix any issues:
+1. Delete vercel.json if it exists
+2. Check if React Router is used anywhere — if yes, create public/_redirects containing exactly: /* /index.html 200
+3. Check .env files — remove any values that reference vercel.app URLs
+4. Run npm run build and confirm it completes with no errors
+5. List every file you changed`}</CodeBlock>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part B — Push and deploy (manual)
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>Commit any changes and push to GitHub</li>
+              <li>
+                <strong>dash.cloudflare.com</strong> → Workers &amp; Pages → Pages
+                → Create a project → Connect to Git
+              </li>
+              <li>Select tip calculator repo → <strong>Begin setup</strong></li>
+              <li>
+                Build settings:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Project name:</strong> tip-calculator</li>
+                  <li><strong>Production branch:</strong> main</li>
+                  <li><strong>Framework preset:</strong> None</li>
+                  <li><strong>Build command:</strong> npm run build</li>
+                  <li><strong>Build output directory:</strong> dist</li>
+                </ul>
+                Click <strong>Save and Deploy</strong>
+              </li>
+              <li>Click the live URL when complete and confirm the calculator works fully</li>
+            </ol>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part C — Update vibe-hub
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Run this Claude Code prompt <strong>in vibe-hub</strong>:
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-hub</div>
+            <CodeBlock lang="prompt">{`In src/data/projects.js, find the tip calculator entry and update its url to [paste your new Cloudflare pages.dev URL]. Update its host field to 'cloudflare'. Commit and push.`}</CodeBlock>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The Tip Calculator is live at a .pages.dev URL. Tip calculation and bill splitting work correctly. Note the URL for Step 14.</span>
+              <span>Tip Calculator is live on Cloudflare Pages, vibe-hub card links to the new URL, host badge shows Cloudflare.</span>
             </div>
           </div>
 
@@ -1430,16 +1618,91 @@ export default function Module7() {
               <span className="build-step-title">Final checks and redeploy everything</span>
             </div>
             <p className="build-step-desc">
-              Run through the full deployment checklist. Trigger a fresh deploy of vibe-hub.
-              Push the Showcase changes to vibe-advanced. Confirm the Worker returns correct
-              status for all 5 projects. If any checklist item fails, fix it now.
+              Two parts: verify the full architecture manually, then redeploy everything cleanly in order.
             </p>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 10px' }}>
+              Verify the full architecture
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Open each URL in a new tab and confirm:
+            </p>
+            <ul style={{ paddingLeft: 24, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
+              {[
+                'vibe-hub loads at its Cloudflare URL (pages.dev or custom domain)',
+                'Counter App loads at its Cloudflare pages.dev URL',
+                'Tip Calculator loads at its Cloudflare pages.dev URL',
+                'vibe-advanced.vercel.app loads normally',
+                'vibe-advanced.vercel.app/showcase loads and shows all 5 projects',
+                'Worker URL returns JSON when opened directly in the browser',
+              ].map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '12px 0 8px', lineHeight: 1.7 }}>
+              <strong>Test status dots:</strong>
+            </p>
+            <ul style={{ paddingLeft: 24, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
+              {[
+                'All 5 dots show green on vibe-hub',
+                'All 5 dots show green on /showcase',
+                'Open vibe-hub/src/data/projects.js locally → temporarily change one URL to https://this-does-not-exist-123.com → run npm run dev → confirm that project\'s dot turns red → revert the change → confirm it goes green again',
+              ].map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '12px 0 8px', lineHeight: 1.7 }}>
+              <strong>Test React Router fix:</strong>
+            </p>
+            <ul style={{ paddingLeft: 24, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
+              {[
+                'On vibe-hub: navigate to any non-root path by typing it in the address bar → confirm no 404',
+                'On counter app: same test',
+                'On tip calculator: same test',
+              ].map((item, i) => (
+                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 10px' }}>
+              Redeploy everything cleanly
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
+              Run through these in order — do not skip any:
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 14, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                <strong>vibe-hub:</strong> confirm all project URLs in <code>src/data/projects.js</code> are the
+                final correct live URLs (Cloudflare for counter + tip calculator, Vercel for the rest) →
+                <code>git add . → git commit -m "final: correct project URLs" → git push</code> →
+                watch Cloudflare Pages auto-deploy → confirm deployment completes with no errors
+              </li>
+              <li>
+                <strong>vibe-status-worker:</strong> in the worker folder run <code>wrangler deploy</code> →
+                confirm the output shows "Published" with no errors → hit the live workers.dev URL one
+                more time to confirm it still returns correct JSON
+              </li>
+              <li>
+                <strong>vibe-advanced:</strong> confirm /showcase is working locally with <code>npm run dev</code> →
+                <code>git add . → git commit -m "feat: showcase page with live project status" → git push</code> →
+                watch Vercel auto-deploy → visit vibe-advanced.vercel.app/showcase on the live URL
+              </li>
+            </ol>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
             <CodeBlock lang="prompt">{STEP_PROMPTS['16']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>All 16 checklist items below are checked. Both sites work in incognito on mobile. The Worker returns correct status JSON for all 5 projects.</span>
+              <span>Every box above is checked. All three repos are on their latest version in production. Every live URL works correctly.</span>
             </div>
           </div>
 
