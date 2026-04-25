@@ -77,25 +77,6 @@ const results = await Promise.all(
 // results = [['quiz-app', 'online'], ['vibe-advanced', 'online'], ...]
 const statusMap = Object.fromEntries(results)`
 
-const CORS_EXAMPLE = `// Why CORS matters: browsers block cross-origin requests by default.
-// A Worker called from vibe-advanced (Vercel) to workers.dev
-// is cross-origin — without these headers, the browser rejects it.
-
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',          // allow any origin
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-}
-
-// Handle preflight — browser sends OPTIONS first to ask "is this allowed?"
-if (request.method === 'OPTIONS') {
-  return new Response(null, { headers: CORS_HEADERS })
-}
-
-// Every response needs CORS headers — not just the preflight
-return new Response(JSON.stringify(data), {
-  headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-})`
 
 const WRANGLER_TOML_EXAMPLE = `# wrangler.toml — the Worker's config file. Commit this to git.
 # Never put secrets here — use: wrangler secret put MY_KEY
@@ -153,62 +134,6 @@ Create src/index.css — modern portfolio aesthetic (NOT ink-on-paper):
   Hover: translateY(-2px), border-color rgba(255,255,255,0.2)
   Font: system-ui, -apple-system, sans-serif (no serifs)`,
 
-  '02': `My vibe-hub React + Vite project is ready. Help me deploy it to Cloudflare Pages via GitHub.
-
-1. Initialise git and push to a new GitHub repo:
-   git init
-   git add .
-   git commit -m "Initial vibe-hub — 5 project cards"
-   (Create a new empty repo on github.com named "vibe-hub", then:)
-   git remote add origin https://github.com/YOUR_USERNAME/vibe-hub.git
-   git push -u origin main
-
-2. Connect to Cloudflare Pages:
-   Cloudflare dashboard → Pages → Create a project → Connect to Git
-   Select the vibe-hub repo.
-   Build settings:
-     Framework preset: None
-     Build command: npm run build
-     Build output directory: dist
-   Click Save and Deploy.
-
-3. Create public/_redirects (so React Router works on Cloudflare):
-   /* /index.html 200
-   Commit this file and push — Cloudflare picks it up on the next build.
-
-Wait for the deployment to complete (~60 seconds).
-Visit the .pages.dev URL in the browser — all 5 project cards should be visible.`,
-
-  '03': `I need to add a VITE_HUB_VERSION environment variable to my vibe-hub on Cloudflare Pages
-and display it in the footer.
-
-1. In Cloudflare dashboard → Pages → vibe-hub → Settings → Environment Variables:
-   Variable name: VITE_HUB_VERSION
-   Value: 1.0.0
-   Set for both Production and Preview environments.
-   Click Save.
-
-2. In src/pages/Home.jsx, add a footer at the bottom of the return:
-   <footer className="hub-footer">
-     <span>vibe-hub · built in VIBE:ADVANCED</span>
-     <span>v{import.meta.env.VITE_HUB_VERSION ?? 'dev'}</span>
-   </footer>
-
-3. Add .hub-footer to src/index.css:
-   .hub-footer {
-     display: flex;
-     justify-content: space-between;
-     padding: 32px 0 16px;
-     font-size: 12px;
-     color: rgba(229,231,235,0.4);
-     border-top: 1px solid rgba(255,255,255,0.06);
-     margin-top: 64px;
-   }
-
-4. Commit and push — Cloudflare auto-redeploys from GitHub.
-   (If you only changed the env var with no code changes: go to
-   Deployments → Retry deployment to force a rebuild with the new var.)`,
-
   '04': `Set up Cloudflare Workers development environment and scaffold a new Worker project.
 
 1. Install Wrangler (Cloudflare's CLI):
@@ -232,150 +157,6 @@ and display it in the footer.
 Visit http://localhost:8787 — you should see a "Hello World!" response.
 Look at src/index.js — this is the complete minimal Worker structure.`,
 
-  '05': `Replace the placeholder Worker in vibe-status-worker/src/index.js with a real
-status-checking endpoint.
-
-The Worker should:
-1. Export a default object with a fetch() handler
-2. Handle GET /status:
-   - Define PROJECTS array: [{ id, url }] for all 5 projects
-   - Use Promise.all() to check all URLs in parallel with HEAD requests
-   - Use AbortSignal.timeout(5000) on each fetch (slow sites don't block)
-   - Return JSON: { projectId: 'online' | 'offline' } for each project
-3. Handle OPTIONS (CORS preflight) — return 200 with CORS headers
-4. Set CORS headers on every response:
-   Access-Control-Allow-Origin: *
-   Access-Control-Allow-Methods: GET, OPTIONS
-   Access-Control-Allow-Headers: Content-Type
-5. Return 404 for any other path
-
-Project URLs:
-  quiz-app:      https://quiz-app-eosin-one-15.vercel.app
-  vibe-advanced: https://vibe-advanced.vercel.app
-  tip-calc:      https://tip-calculator-phi-seven.vercel.app
-  counter:       https://counter-app-five-rouge.vercel.app
-  link-in-bio:   https://your-link-in-bio.vercel.app  ← update this URL
-
-After writing, test with: curl http://localhost:8787/status`,
-
-  '06': `Deploy my vibe-status-worker to production on Cloudflare Workers.
-
-1. Check wrangler.toml is correct:
-   name = "vibe-status-worker"
-   main = "src/index.js"
-   compatibility_date = "2024-01-01"
-
-2. Deploy:
-   wrangler deploy
-
-3. Note the live URL from the deploy output:
-   https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev
-
-4. Test the live endpoint:
-   curl https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status
-
-5. Test CORS from the browser console (open any site, open DevTools → Console):
-   fetch('https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status')
-     .then(r => r.json())
-     .then(console.log)
-
-Save the full Worker URL — you'll need it for Steps 8 and 9.`,
-
-  '07': `In my vibe-advanced React course site, add a Showcase page at /showcase.
-
-1. Create src/data/projects.js (same data as vibe-hub):
-export const PROJECTS = [
-  { id: 'quiz-app',      title: 'Quiz App',       desc: 'Ten questions. 30-second timer. Live leaderboard.',       url: 'https://quiz-app-eosin-one-15.vercel.app',    stack: ['React','Supabase','Vercel'], builtIn: 'Module 5' },
-  { id: 'vibe-advanced', title: 'VIBE:ADVANCED',  desc: 'The course site itself — eight modules, three projects.',  url: 'https://vibe-advanced.vercel.app',            stack: ['React','Vite','Supabase'],   builtIn: 'All modules' },
-  { id: 'tip-calc',      title: 'Tip Calculator', desc: 'Split bills instantly. Clean, fast, no fluff.',           url: 'https://tip-calculator-phi-seven.vercel.app', stack: ['React','Vite'],             builtIn: 'Module 1' },
-  { id: 'counter',       title: 'Counter',        desc: 'The classic first app. Deployed, not just run locally.',  url: 'https://counter-app-five-rouge.vercel.app',   stack: ['React'],                    builtIn: 'Module 1' },
-  { id: 'link-in-bio',   title: 'Link-in-Bio',    desc: 'Custom profile pages, link management, click tracking.', url: 'https://your-link-in-bio.vercel.app',         stack: ['React','Supabase','Vercel'],builtIn: 'Module 6' },
-]
-
-2. Create src/pages/Showcase.jsx using vibe-advanced's ink-on-paper aesthetic:
-   - <Header variant="module" />
-   - module-hero div: kicker "Showcase" + h1 "Projects you shipped"
-   - Import PROJECTS, map to project cards using existing CSS class patterns
-   - Each card: title, desc, stack tags, external link, status dot placeholder (class "status-dot")
-   - <ModuleNav prev={{ to: '/module/7', label: '07 Cloudflare' }} next={{ to: '#', label: '' }} />
-
-3. Add route to App.jsx:
-   import Showcase from './pages/Showcase'
-   <Route path="/showcase" element={<ProtectedRoute><Showcase /></ProtectedRoute>} />
-
-4. Add NavLink to Header.jsx inside the nav-links section:
-   <NavLink to="/showcase">Showcase</NavLink>`,
-
-  '08': `In src/pages/Showcase.jsx in my vibe-advanced codebase, connect the live Cloudflare Worker.
-
-Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 6.
-
-1. Add to the Showcase component:
-   const WORKER_URL = 'https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status'
-   const [status, setStatus] = useState({})
-   const [statusLoading, setStatusLoading] = useState(true)
-
-   useEffect(() => {
-     fetch(WORKER_URL)
-       .then(r => r.json())
-       .then(data => setStatus(data))
-       .catch(() => {})
-       .finally(() => setStatusLoading(false))
-   }, [])
-
-2. On each project card, replace the placeholder status-dot with:
-   <span
-     className={\`status-dot \${
-       statusLoading              ? 'status-checking' :
-       status[p.id] === 'online'  ? 'status-online'   :
-       status[p.id] === 'offline' ? 'status-offline'  :
-       'status-checking'
-     }\`}
-     title={statusLoading ? 'Checking…' : (status[p.id] ?? 'unknown')}
-   />
-
-3. Add to src/index.css:
-   .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-   .status-online   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5); }
-   .status-offline  { background: #ef4444; }
-   .status-checking { background: var(--rule); }`,
-
-  '09': `In the vibe-hub React + Vite project, add live status dots from the Cloudflare Worker.
-
-Replace YOUR_WORKER_URL with your actual workers.dev URL.
-
-1. In src/pages/Home.jsx:
-   Add useState, useEffect imports
-   const [status, setStatus] = useState({})
-   const [statusLoading, setStatusLoading] = useState(true)
-
-   useEffect(() => {
-     const WORKER = 'https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status'
-     fetch(WORKER)
-       .then(r => r.json())
-       .then(data => setStatus(data))
-       .catch(() => {})
-       .finally(() => setStatusLoading(false))
-   }, [])
-
-   Pass to each card:
-   <ProjectCard
-     project={p}
-     status={statusLoading ? 'checking' : (status[p.id] ?? 'unknown')}
-   />
-
-2. In src/components/ProjectCard.jsx:
-   Accept status prop
-   Render: <span className={\`project-status project-status--\${status}\`} />
-
-3. Add to src/index.css:
-   .project-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-   .project-status--online   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.4); }
-   .project-status--offline  { background: #ef4444; }
-   .project-status--checking { background: rgba(229,231,235,.15); }
-
-4. Commit and push — Cloudflare Pages redeploys automatically.`,
-
   '11': `Run Lighthouse audits on both deployed sites and optimise where needed.
 
 1. Open Chrome → DevTools → Lighthouse tab
@@ -397,46 +178,6 @@ Replace YOUR_WORKER_URL with your actual workers.dev URL.
 4. Document the scores at the top of vibe-advanced/src/pages/Showcase.jsx:
    // Lighthouse — vibe-hub (Cloudflare):   Perf XX | A11y XX | BP XX | SEO XX
    // Lighthouse — vibe-advanced (Vercel):  Perf XX | A11y XX | BP XX | SEO XX`,
-
-  '12': `Migrate the Counter App from Vercel to Cloudflare Pages.
-
-1. In Cloudflare Pages dashboard → Create a project → Connect to Git:
-   Select the counter-app GitHub repo.
-   Build command: npm run build
-   Build output directory: dist
-   No environment variables needed.
-   Click Save and Deploy.
-
-2. While it deploys, add public/_redirects to the counter-app repo:
-   /* /index.html 200
-   Commit and push — triggers a second deploy with the redirects in place.
-
-3. Once live, test the Cloudflare Pages URL:
-   - Counter increments and resets correctly
-   - No console errors
-   - Works at 375px mobile width in DevTools
-
-4. Note your new counter .pages.dev URL — you'll update projects.js in Step 14.`,
-
-  '13': `Migrate the Tip Calculator from Vercel to Cloudflare Pages.
-
-1. In Cloudflare Pages dashboard → Create a project → Connect to Git:
-   Select the tip-calculator GitHub repo.
-   Build command: npm run build
-   Build output directory: dist
-   No environment variables needed.
-   Click Save and Deploy.
-
-2. While it deploys, add public/_redirects to the tip-calculator repo:
-   /* /index.html 200
-   Commit and push — triggers a second deploy with the redirects in place.
-
-3. Once live, test the Cloudflare Pages URL:
-   - Tip calculation and bill splitting work correctly
-   - No console errors
-   - Works at 375px mobile width in DevTools
-
-4. Note your new tip-calculator .pages.dev URL — you'll update projects.js in Step 14.`,
 
   '14': `Update projects.js in both repos with the new Cloudflare Pages URLs for counter and tip-calc.
 
@@ -470,29 +211,6 @@ Verify:
 
 Open both vibe-hub and /showcase in the browser — status dots should all be green.`,
 
-  '16': `Run final deployment checks across all three deployments for Module 7.
-
-vibe-hub (Cloudflare Pages):
-  □ Footer shows version from VITE_HUB_VERSION env var (not "dev")
-  □ All 5 project cards render with correct titles, descriptions, and links
-  □ Counter and Tip Calculator cards link to .pages.dev URLs (not Vercel)
-  □ Status dots appear — green for online projects after a few seconds
-  □ Run: npm run build — confirm zero errors
-  □ Test in incognito Chrome on mobile (375px viewport)
-
-vibe-advanced (Vercel — /showcase):
-  □ /showcase renders at the live Vercel URL
-  □ "Showcase" appears in the nav and is clickable
-  □ Status dots appear on the project cards
-  □ Push all uncommitted changes: git add . && git commit -m "Module 7 complete" && git push
-
-Status Worker (Cloudflare Workers):
-  □ curl YOUR_WORKER_URL/status returns JSON with all 5 project IDs
-  □ Counter and Tip Calculator entries show the Cloudflare Pages URLs (not Vercel)
-  □ wrangler.toml is committed to the Worker repo
-  □ No secrets are visible in wrangler.toml
-
-Mark all 16 items in the deployment checklist below as done.`,
 }
 
 // ── Deployment checklist ──────────────────────────────────────────────────────
@@ -938,54 +656,55 @@ export default function Module7() {
               <span className="build-step-title">Deploy vibe-hub to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              MANUAL STEPS — no Claude Code prompt needed for this step.
+              Manual dashboard work — no Claude Code prompt needed for this step.
             </p>
 
             <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
-                Go to <strong>dash.cloudflare.com</strong> → click <strong>"Workers &amp; Pages"</strong> in the
-                left sidebar → click the <strong>"Pages"</strong> tab → click <strong>"Create a project"</strong>
+                Push vibe-hub to GitHub if not already done:
+                VS Code Source Control → Stage all → commit message <strong>"init: vibe-hub"</strong> → Sync Changes
               </li>
               <li>
-                Click <strong>"Connect to Git"</strong> → if prompted to install the Cloudflare GitHub app,
-                click <strong>"Install &amp; Authorize"</strong> → keep <strong>"All repositories"</strong> selected
-                → click <strong>"Install &amp; Authorize"</strong> → you are redirected back to Cloudflare
+                Go to <strong>dash.cloudflare.com</strong><br />
+                Left sidebar → <strong>Workers &amp; Pages</strong> → <strong>Pages</strong> tab
+                → click <strong>"Create a project"</strong> → click <strong>"Connect to Git"</strong>
               </li>
               <li>
-                Find <strong>"vibe-hub"</strong> in your repository list and click <strong>"Begin setup"</strong>
+                If prompted: click <strong>"Install &amp; Authorize"</strong> for the Cloudflare GitHub app
+                → keep <strong>"All repositories"</strong> selected → click <strong>"Install &amp; Authorize"</strong>
+                → you are redirected back
+              </li>
+              <li>
+                Find <strong>"vibe-hub"</strong> in the repository list → click <strong>"Begin setup"</strong>
               </li>
               <li>
                 Configure build settings <strong>EXACTLY</strong> as follows:
                 <ul style={{ paddingLeft: 20, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
                   <li><strong>Project name:</strong> vibe-hub</li>
                   <li><strong>Production branch:</strong> main</li>
-                  <li><strong>Framework preset:</strong> None (do not select React)</li>
+                  <li><strong>Framework preset:</strong> None (do NOT select React)</li>
                   <li><strong>Build command:</strong> npm run build</li>
                   <li><strong>Build output directory:</strong> dist</li>
                   <li>Leave all other fields empty</li>
                 </ul>
               </li>
               <li>
-                Click <strong>"Save and Deploy"</strong> — the first build takes about 2 minutes
+                Click <strong>"Save and Deploy"</strong> — first build takes ~2 minutes. Watch the build log.
               </li>
               <li>
-                When the build completes click <strong>"Continue to project"</strong> — you will see a generated URL
-                in the format: <code>vibe-hub.pages.dev</code> or <code>vibe-hub-RANDOM.pages.dev</code>
-              </li>
-              <li>
-                Click the URL and confirm vibe-hub loads with all project cards
+                When complete click <strong>"Continue to project"</strong> — you will see a URL like{' '}
+                <code>vibe-hub.pages.dev</code>. Click it — confirm vibe-hub loads with all project cards.
               </li>
             </ol>
 
-            <Callout type="warning">
-              <strong>If you accidentally created a Worker instead of a Pages project:</strong> go to
-              Workers &amp; Pages → find the Worker → click it → Settings → scroll to bottom → Delete.
-              Then start this step again from point 1.
+            <Callout>
+              <strong>If you accidentally created a Worker instead of a Pages project:</strong> Workers &amp; Pages
+              → find it → click it → Settings → scroll to bottom → Delete → then start from step 2 above.
             </Callout>
 
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>vibe-hub is live at a pages.dev URL, all project cards are visible, and no 404 appears on page refresh.</span>
+              <span>vibe-hub is live at a pages.dev URL, all project cards visible, no 404 on page refresh.</span>
             </div>
           </div>
 
@@ -996,9 +715,8 @@ export default function Module7() {
               <span className="build-step-title">Environment variables on Cloudflare</span>
             </div>
             <p className="build-step-desc">
-              Add a <code>VITE_HUB_VERSION</code> env var to the Cloudflare Pages dashboard.
-              Display it in the hub footer. Trigger a manual redeploy. Confirm the live site shows
-              the env var value — not a hardcoded string.
+              Manual dashboard work to add the env var, then a single Claude Code prompt to display
+              it in the hub footer.
             </p>
 
             <SectionLabel text="// concept: cloudflare vs vercel env vars" />
@@ -1020,11 +738,42 @@ export default function Module7() {
               missing a redeploy is almost certainly why.
             </Callout>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['03']}</CodeBlock>
+            <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                <strong>dash.cloudflare.com</strong> → Workers &amp; Pages → click <strong>vibe-hub</strong>
+                → click <strong>"Settings"</strong> tab → click <strong>"Environment Variables"</strong>
+                in the left menu → click <strong>"Add variable"</strong>
+              </li>
+              <li>
+                Enter exactly:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li><strong>Variable name:</strong> VITE_HUB_VERSION</li>
+                  <li><strong>Value:</strong> 1.0.0</li>
+                </ul>
+                Click <strong>"Save"</strong>
+              </li>
+              <li>
+                Cloudflare does NOT auto-redeploy when you add env vars — trigger it manually:
+                <strong>Deployments</strong> tab → find your latest deployment → click the three dots
+                (<strong>···</strong>) → click <strong>"Retry deployment"</strong> → wait ~2 minutes
+              </li>
+            </ol>
+
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-hub repo</div>
+            <CodeBlock lang="prompt">{`In src/pages/Home.jsx find the footer section or the bottom of the page. Add a small version display that reads import.meta.env.VITE_HUB_VERSION and renders it as:
+<span style={{fontSize: '11px', opacity: 0.4}}>
+  v{import.meta.env.VITE_HUB_VERSION}
+</span>
+Only render it if the value is defined. Commit and push.`}</CodeBlock>
+
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '16px 0', lineHeight: 1.8 }}>
+              Cloudflare auto-deploys on push. Wait ~2 minutes then visit the live pages.dev URL.
+              Confirm the version (e.g. <strong>v1.0.0</strong>) appears in the footer.
+            </p>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The live .pages.dev site shows "v1.0.0" in the footer. Local dev shows "vdev" — the env var only lives in the Cloudflare dashboard.</span>
+              <span>Live Cloudflare URL shows the version from the env var in the footer. DevTools → Network — confirm no .env file is served (env vars are baked in at build time).</span>
             </div>
           </div>
 
@@ -1077,10 +826,31 @@ export default function Module7() {
               <span className="build-step-title">Build the project status Worker</span>
             </div>
             <p className="build-step-desc">
-              Write a Worker that accepts GET /status, checks all 5 project URLs in parallel using
-              HEAD requests, and returns JSON with the live status of each. Handle errors and
-              timeouts gracefully — a slow site shouldn't block the whole response.
+              Three parts: scaffold the project in your terminal, write the Worker with Claude Code,
+              then test it locally.
             </p>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part A — Create the Worker project (terminal)
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                Navigate to wherever you keep your projects —
+                <strong>not</strong> inside vibe-hub or vibe-advanced:<br />
+                <code>cd path/to/your/projects</code>
+              </li>
+              <li>
+                Run: <code>npm create cloudflare@latest vibe-status-worker</code><br />
+                When prompted:
+                <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
+                  <li>What would you like to start with? → <strong>Hello World example</strong></li>
+                  <li>Which template? → <strong>Hello World Worker</strong></li>
+                  <li>Do you want to use TypeScript? → <strong>No</strong></li>
+                  <li>Do you want to deploy? → <strong>No</strong> (not yet)</li>
+                </ul>
+              </li>
+              <li><code>cd vibe-status-worker</code> then open in VS Code: <code>code .</code></li>
+            </ol>
 
             <SectionLabel text="// concept: outbound fetch from a worker" />
             <LessonHeading main="Workers can make" accent="outbound HTTP requests." />
@@ -1100,11 +870,49 @@ export default function Module7() {
             </LessonText>
             <CodeBlock lang="js">{WORKER_STATUS_EXAMPLE}</CodeBlock>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['05']}</CodeBlock>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part B — Write the Worker
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-status-worker repo</div>
+            <CodeBlock lang="prompt">{`Write a Cloudflare Worker in src/index.js that does the following:
+
+- Handles GET /status requests
+- Contains a hardcoded array of projects with id and url:
+  [
+    { id: 'vibe-advanced', url: 'https://vibe-advanced.vercel.app' },
+    { id: 'quiz-app', url: '[quiz app URL]' },
+    { id: 'link-in-bio', url: '[link-in-bio URL]' },
+    { id: 'counter', url: '[counter Cloudflare URL]' },
+    { id: 'tip-calculator', url: '[tip calculator Cloudflare URL]' }
+  ]
+- Makes a HEAD request to each URL in parallel using Promise.all()
+- Each request has a 5 second timeout using AbortController
+- Returns JSON: { 'vibe-advanced': 'online', 'quiz-app': 'online', ... }
+  where each value is 'online' if the request succeeded or 'offline' if it failed or timed out
+- Sets these headers on every response:
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET
+  Content-Type: application/json
+- Handles OPTIONS preflight requests (return 200 with CORS headers)
+- Wraps everything in try/catch — never returns a 500
+
+Also update wrangler.toml:
+name = 'vibe-status-worker'
+main = 'src/index.js'
+compatibility_date = '2024-01-01'`}</CodeBlock>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part C — Test locally (terminal)
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '0 0 10px', lineHeight: 1.8 }}>
+              Run: <code>npx wrangler dev</code><br />
+              Open browser: <code>http://localhost:8787/status</code><br />
+              Confirm you see JSON with a status for each project.
+            </p>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span><code>curl http://localhost:8787/status</code> returns a JSON object with a status for each of the 5 projects. No key should be missing.</span>
+              <span><code>npx wrangler dev</code> runs and <code>http://localhost:8787/status</code> returns correct JSON for all 5 projects.</span>
             </div>
           </div>
 
@@ -1115,37 +923,35 @@ export default function Module7() {
               <span className="build-step-title">Deploy the Worker to production</span>
             </div>
             <p className="build-step-desc">
-              Run <code>wrangler deploy</code> from your terminal, test the live URL, and save it —
-              you will need it in the next three steps.
+              Terminal work only — no Claude Code prompt needed for this step.
             </p>
 
             <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
-                In your terminal, navigate to the vibe-status-worker folder:<br />
-                <code>cd path/to/vibe-status-worker</code>
+                In the vibe-status-worker terminal:
+                Run: <code>npx wrangler deploy</code>
               </li>
               <li>
-                Run: <code>wrangler deploy</code><br />
                 Output will show something like:<br />
                 <code>Uploaded vibe-status-worker (1.23 sec)</code><br />
                 <code>Published vibe-status-worker (0.42 sec)</code><br />
-                <code>https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev</code>
-              </li>
-              <li>Copy the <code>workers.dev</code> URL from the output</li>
-              <li>
-                Test it immediately — open the URL in your browser. You should see JSON like:<br />
-                <code>{'{"quiz":"online","vibe-advanced":"online",...}'}</code><br />
-                Or test with curl: <code>curl https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev/status</code>
+                <code>https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev</code><br />
+                Copy this URL.
               </li>
               <li>
-                If you see an error instead of JSON:
+                Test it immediately — open the URL in your browser:<br />
+                <code>https://vibe-status-worker.YOUR-SUBDOMAIN.workers.dev/status</code><br />
+                You should see JSON with online/offline for each project.
+              </li>
+              <li>
+                If you see an error:
                 <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
-                  <li><strong>"No route matched"</strong> → check your Worker handles GET /status</li>
-                  <li><strong>"Internal error"</strong> → run <code>wrangler tail</code> in a second terminal to see live logs while you hit the URL again</li>
-                  <li><strong>CORS error in browser</strong> → check your Worker sets <code>Access-Control-Allow-Origin: *</code> in the response headers</li>
+                  <li><strong>"No route matched"</strong> → make sure you added <code>/status</code> to the URL</li>
+                  <li><strong>"Internal error"</strong> → run <code>npx wrangler tail</code> in a second terminal, hit the URL again, read the live error log</li>
+                  <li><strong>CORS error in browser</strong> → check <code>Access-Control-Allow-Origin: *</code> is set in your Worker's response headers</li>
                 </ul>
               </li>
-              <li>Save the workers.dev URL — you will need it in the next step for <code>VITE_WORKER_URL</code> in both vibe-hub and vibe-advanced</li>
+              <li>Save this URL — you need it in the next two steps as <code>VITE_WORKER_URL</code></li>
             </ol>
 
             <SectionLabel text="// concept: wrangler.toml" />
@@ -1165,11 +971,9 @@ export default function Module7() {
               infrastructure and injected into <code>env</code> at runtime — never in your code.
             </Callout>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['06']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The live workers.dev URL returns the correct status JSON in the browser. All 5 project IDs appear in the response.</span>
+              <span>Live workers.dev/status URL returns correct JSON for all 5 projects when opened in the browser.</span>
             </div>
           </div>
 
@@ -1180,9 +984,7 @@ export default function Module7() {
               <span className="build-step-title">Add the Showcase section to VIBE:ADVANCED</span>
             </div>
             <p className="build-step-desc">
-              Switch back to the vibe-advanced codebase. Add a /showcase route, a shared projects
-              data file, a new Showcase page, and a nav link. No new concepts — this step applies
-              everything built so far to the main course site.
+              Claude Code prompt only — run in the vibe-advanced repo, not vibe-hub.
             </p>
             <div className="callout">
               <p><strong>Note:</strong> The Showcase is a new route on <em>this</em> site
@@ -1191,11 +993,30 @@ export default function Module7() {
               style of vibe-hub.</p>
             </div>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['07']}</CodeBlock>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-advanced repo</div>
+            <CodeBlock lang="prompt">{`Do the following in the vibe-advanced codebase:
+
+1. Create src/data/projects.js — copy the projects array from vibe-hub's src/data/projects.js exactly. Add a comment at the top: // Keep in sync with vibe-hub/src/data/projects.js
+
+2. Create src/pages/Showcase.jsx that:
+   - Renders all projects from projects.js in a grid
+   - Matches vibe-advanced's existing ink-on-paper aesthetic exactly — same fonts, colors, border styles as other pages
+   - Each card shows: title, description, stack tags, host badge (CF or Vercel), live link that opens in a new tab, and a status dot
+   - Uses useFetch to call import.meta.env.VITE_WORKER_URL + '/status' on mount
+   - Shows loading and error states
+
+3. Add route /showcase to App.jsx
+
+4. Add 'Showcase' link to the Navbar component
+
+5. Add a Showcase card to Home.jsx linking to /showcase
+
+6. Add VITE_WORKER_URL to .env.local with the workers.dev URL
+
+Test locally with npm run dev — confirm /showcase loads with all 5 projects and status dots appear.`}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>/showcase renders all 5 project cards on the live Vercel deployment. The "Showcase" link appears in the nav.</span>
+              <span>/showcase renders all 5 projects with coloured status dots on local dev server.</span>
             </div>
           </div>
 
@@ -1206,62 +1027,50 @@ export default function Module7() {
               <span className="build-step-title">Connect the status Worker to the Showcase</span>
             </div>
             <p className="build-step-desc">
-              First set <code>VITE_WORKER_URL</code> in the Vercel dashboard, then use the Claude
-              Code prompt below to wire the live Worker into the Showcase.
+              Manual dashboard work — no Claude Code prompt. Push the /showcase changes first,
+              then add the env var to Vercel and redeploy.
             </p>
 
-            <SectionLabel text="// manual: add VITE_WORKER_URL to Vercel" />
-            <LessonHeading main="Set the env var" accent="before writing any code." />
             <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
-                Go to <strong>vercel.com</strong> → click your <strong>vibe-advanced</strong> project
-                → click the <strong>"Settings"</strong> tab → click <strong>"Environment Variables"</strong> in the left sidebar
+                Push the /showcase changes to GitHub first:
+                VS Code Source Control → stage all →
+                commit <strong>"feat: showcase page with live status"</strong> → Sync Changes
               </li>
               <li>
-                Add the following variable:
+                Go to <strong>vercel.com</strong> → click <strong>vibe-advanced</strong> project
+                → click <strong>"Settings"</strong> tab → click <strong>"Environment Variables"</strong> in the left sidebar
+              </li>
+              <li>
+                Click <strong>"Add New"</strong>:
                 <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
                   <li><strong>Key:</strong> VITE_WORKER_URL</li>
-                  <li><strong>Value:</strong> [paste your workers.dev URL from Step 6]</li>
-                  <li><strong>Environment:</strong> Production + Preview + Development (check all three)</li>
+                  <li><strong>Value:</strong> your full workers.dev URL</li>
+                  <li><strong>Environments:</strong> check Production, Preview, and Development</li>
                 </ul>
                 Click <strong>"Save"</strong>
               </li>
               <li>
-                Trigger a manual redeploy to pick up the new env var:
-                go to the <strong>"Deployments"</strong> tab → find the latest deployment →
-                click the three-dot menu → <strong>"Redeploy"</strong> → confirm
+                Trigger a redeploy:
+                click <strong>"Deployments"</strong> tab → find the latest deployment
+                → click the three dots (<strong>···</strong>) → click <strong>"Redeploy"</strong>
+                → click <strong>"Redeploy"</strong> again to confirm → wait ~1–2 minutes
               </li>
-              <li>Wait for the build to complete (~1–2 minutes)</li>
               <li>
-                If status dots are still grey after redeploy: open DevTools → Console and look for
-                a fetch error. Most likely cause: <code>VITE_WORKER_URL</code> is <code>undefined</code>
-                — check Settings → Environment Variables and confirm the name is spelled exactly
-                as <code>VITE_WORKER_URL</code>
+                Visit <strong>vibe-advanced.vercel.app/showcase</strong> — status dots should now
+                be coloured (green = online)
+              </li>
+              <li>
+                If dots are still grey after redeploy: DevTools → Console → look for a fetch error.
+                Most likely cause: <code>VITE_WORKER_URL</code> is <code>undefined</code> — check the
+                variable name has no typo. Also confirm your Worker has <code>Access-Control-Allow-Origin: *</code>
+                in its response headers.
               </li>
             </ol>
 
-            <SectionLabel text="// concept: cors in practice" />
-            <LessonHeading main="Why CORS exists" accent="and when it matters." />
-            <LessonText>
-              CORS (Cross-Origin Resource Sharing) is a browser security policy. When JavaScript
-              on one origin (say, <code>vibe-advanced.vercel.app</code>) makes a fetch to a
-              different origin (<code>vibe-status-worker.workers.dev</code>), the browser checks
-              if the server allows it. If the server doesn't send back the right headers, the
-              browser rejects the response — even if the server returned 200.
-            </LessonText>
-            <LessonText>
-              CORS does <em>not</em> apply to server-to-server requests. When the Worker checks
-              the project URLs internally, CORS isn't involved — that's a server-side fetch. CORS
-              only kicks in when a browser makes the request. Worker → external URL (no CORS
-              needed). Browser → Worker (CORS required on the Worker's response).
-            </LessonText>
-            <CodeBlock lang="js">{CORS_EXAMPLE}</CodeBlock>
-
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['08']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The Showcase shows coloured status dots. Online projects show green. DevTools → Network confirms the Worker URL is being called with a 200 response.</span>
+              <span>vibe-advanced.vercel.app/showcase shows all 5 projects with live coloured status dots.</span>
             </div>
           </div>
 
@@ -1272,16 +1081,60 @@ export default function Module7() {
               <span className="build-step-title">Wire up vibe-hub with live Worker data</span>
             </div>
             <p className="build-step-desc">
-              Add the same status Worker integration to vibe-hub. Both surfaces — vibe-hub on
-              Cloudflare and /showcase on Vercel — now show live status dots from the same Worker
-              endpoint. Same data, two hosts, same experience.
+              Three parts: add the env var locally, wire up the status dots with Claude Code, then
+              add the env var to Cloudflare Pages and redeploy.
             </p>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['09']}</CodeBlock>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part A — Add env var to vibe-hub locally
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-hub repo</div>
+            <CodeBlock lang="prompt">{`Create .env.local in the project root if it doesn't exist.
+Add this line: VITE_WORKER_URL=https://your-worker.workers.dev
+I will replace the placeholder value manually after.`}</CodeBlock>
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '10px 0 20px', lineHeight: 1.8 }}>
+              Then open <code>.env.local</code> and replace the placeholder URL with your actual
+              workers.dev URL from Step 6.
+            </p>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part B — Wire up status dots
+            </p>
+            <div className="build-step-prompt-label">// claude code prompt — run in vibe-hub repo</div>
+            <CodeBlock lang="prompt">{`In vibe-hub, do the following:
+1. Create src/hooks/useFetch.js — a hook that takes a url, returns { data, loading, error }, fetches on mount, exposes a refetch function
+2. In src/pages/Home.jsx, call useFetch with import.meta.env.VITE_WORKER_URL + '/status' on mount
+3. Pass each project's status down to its ProjectCard as a 'status' prop (match by project id)
+4. In src/components/ProjectCard.jsx, add a status dot:
+   - Green circle if status === 'online'
+   - Red circle if status === 'offline'
+   - Grey pulsing circle if status is undefined (loading)
+   Use inline styles or a className — match existing styling
+5. Commit and push`}</CodeBlock>
+
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 8px' }}>
+              Part C — Add env var to Cloudflare Pages dashboard
+            </p>
+            <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
+              <li>
+                <strong>dash.cloudflare.com</strong> → Workers &amp; Pages → vibe-hub
+                → Settings → Environment Variables → <strong>Add variable</strong><br />
+                <strong>Name:</strong> VITE_WORKER_URL<br />
+                <strong>Value:</strong> your full workers.dev URL<br />
+                Click <strong>Save</strong>
+              </li>
+              <li>
+                <strong>Deployments</strong> tab → latest deployment → <strong>···</strong>
+                → <strong>Retry deployment</strong> → wait ~2 minutes
+              </li>
+              <li>
+                Visit the live pages.dev URL — confirm coloured status dots appear on all project cards
+              </li>
+            </ol>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>Both vibe-hub (Cloudflare) and /showcase (Vercel) show live status dots. Open both in the same browser window — the status dots reflect the same data.</span>
+              <span>vibe-hub shows green status dots on all 5 cards on the live Cloudflare URL. Test by temporarily editing one URL in projects.js to a bad URL locally — confirm the dot turns red — then revert.</span>
             </div>
           </div>
 
@@ -1312,8 +1165,7 @@ export default function Module7() {
             </LessonText>
 
             <Callout>
-              <strong>Don't own a domain?</strong> Your .pages.dev URL is permanent, free, and completely
-              valid. Skip this step entirely — pages.dev is not a temporary URL.
+              <strong>Don't own a domain?</strong> Your pages.dev URL is permanent and free. Skip this step entirely.
             </Callout>
 
             <SectionLabel text="// walkthrough: connect a custom domain" />
@@ -1322,10 +1174,10 @@ export default function Module7() {
             </p>
             <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 8, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>dash.cloudflare.com → Workers &amp; Pages → vibe-hub → <strong>Custom domains</strong> tab → <strong>Add a custom domain</strong></li>
-              <li>Type your domain or subdomain (e.g. hub.yourdomain.com)</li>
-              <li>Click <strong>Continue</strong> — Cloudflare adds the DNS record automatically</li>
-              <li>SSL certificate is issued automatically within ~1 minute</li>
-              <li>Done — your domain is live</li>
+              <li>Type your domain (e.g. hub.yourdomain.com) → Continue</li>
+              <li>Cloudflare adds the DNS record automatically</li>
+              <li>SSL certificate issued within ~1 minute</li>
+              <li>Visit your domain — confirm it loads with HTTPS</li>
             </ol>
             <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--muted)', marginBottom: 10 }}>
               OPTION B — Domain registered elsewhere (GoDaddy, Namecheap etc):
@@ -1334,26 +1186,25 @@ export default function Module7() {
               <li>dash.cloudflare.com → Workers &amp; Pages → vibe-hub → <strong>Custom domains</strong> tab → <strong>Add a custom domain</strong></li>
               <li>Type your domain → Continue</li>
               <li>
-                Cloudflare shows you a CNAME record to add:
+                Cloudflare shows you a CNAME record:
                 <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
-                  <li><strong>Name:</strong> hub (or @ for root domain)</li>
+                  <li><strong>Name:</strong> hub (or @ for root)</li>
                   <li><strong>Value:</strong> vibe-hub.pages.dev</li>
                 </ul>
               </li>
-              <li>Log into your domain registrar → find DNS settings → add the CNAME record Cloudflare showed you</li>
-              <li>Back in Cloudflare — click <strong>Activate domain</strong></li>
-              <li>DNS propagation takes 1–48 hours (usually under 30 minutes)</li>
-              <li>SSL certificate is issued automatically once DNS propagates</li>
+              <li>Log into your registrar → DNS settings → add that CNAME record exactly as shown</li>
+              <li>Back in Cloudflare → <strong>Activate domain</strong></li>
+              <li>DNS propagation: 10 minutes to 48 hours (usually under 30 minutes)</li>
+              <li>SSL certificate issued automatically once DNS propagates</li>
             </ol>
-            <Callout>
-              <strong>How to confirm it's working:</strong> Visit your domain in the browser. You should
-              see vibe-hub with a padlock (HTTPS) in the address bar. If you see a security warning,
-              SSL is still being issued — wait 10 minutes and retry.
-            </Callout>
+            <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.8, marginBottom: 16 }}>
+              <strong>How to check:</strong> Visit your domain — padlock in address bar = working HTTPS.
+              If you see a security warning, SSL is still being issued. Wait 10 minutes and try again.
+            </p>
 
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>vibe-hub loads at your custom domain with valid HTTPS, OR you have confirmed you are happy with the pages.dev URL and skipped this step intentionally.</span>
+              <span>vibe-hub loads at custom domain with valid HTTPS, OR you have confirmed pages.dev is your permanent URL and skipped this step intentionally.</span>
             </div>
           </div>
 
@@ -1364,31 +1215,30 @@ export default function Module7() {
               <span className="build-step-title">Performance audit</span>
             </div>
             <p className="build-step-desc">
-              Run Lighthouse on both live sites. Both should score 90+ on Performance — Cloudflare's
-              edge caching gives vibe-hub a significant head start.
+              Run Lighthouse on both live sites — target 90+ on Performance. Use the Claude Code
+              prompt below if either site scores below 90.
             </p>
 
             <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
-                Open your live vibe-hub Cloudflare URL in Chrome → open DevTools (F12) → click the
-                <strong>"Lighthouse"</strong> tab → check <strong>Performance</strong> and <strong>Best Practices</strong> only
-                (uncheck others to keep it fast) → click <strong>"Analyze page load"</strong> → wait ~30 seconds
+                Open your live vibe-hub Cloudflare URL in Chrome → F12 → click <strong>"Lighthouse"</strong> tab
+                → check <strong>Performance</strong> and <strong>Best Practices</strong> only
+                → click <strong>"Analyze page load"</strong> → wait ~30 seconds
               </li>
               <li>
-                Note your Performance score. Target is 90+.
+                Note your Performance score. Target: 90+<br />
                 Common fixes if below 90:
                 <ul style={{ paddingLeft: 20, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
-                  <li><strong>Images not optimised</strong> → use WebP format, add width/height attributes</li>
-                  <li><strong>Unused JavaScript</strong> → use the Claude Code prompt below</li>
-                  <li><strong>No caching headers</strong> → Cloudflare handles this automatically for Pages deployments, nothing to do</li>
+                  <li><strong>Images not optimised</strong> → use WebP, add width + height attributes</li>
+                  <li><strong>Unused JS</strong> → see Claude Code prompt below</li>
+                  <li>Cloudflare handles caching automatically — nothing to do there</li>
                 </ul>
               </li>
               <li>Repeat for <strong>vibe-advanced.vercel.app</strong> in a new Chrome tab</li>
               <li>
-                If either site scores below 90, use the Claude Code prompt below — paste in the
-                Lighthouse opportunities list to get targeted fixes
+                If either scores below 90: run the Claude Code prompt below, push the fix,
+                redeploy, run Lighthouse again
               </li>
-              <li>Push the fix, wait for redeploy, run Lighthouse again</li>
             </ol>
 
             <SectionLabel text="// concept: cloudflare edge caching and lighthouse" />
@@ -1625,84 +1475,78 @@ export default function Module7() {
               Verify the full architecture
             </p>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
-              Open each URL in a new tab and confirm:
+              Open each URL in a new tab and confirm it loads:
             </p>
-            <ul style={{ paddingLeft: 24, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
-              {[
-                'vibe-hub loads at its Cloudflare URL (pages.dev or custom domain)',
-                'Counter App loads at its Cloudflare pages.dev URL',
-                'Tip Calculator loads at its Cloudflare pages.dev URL',
-                'vibe-advanced.vercel.app loads normally',
-                'vibe-advanced.vercel.app/showcase loads and shows all 5 projects',
-                'Worker URL returns JSON when opened directly in the browser',
-              ].map((item, i) => (
-                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '12px 0 8px', lineHeight: 1.7 }}>
+            {[
+              'vibe-hub — Cloudflare pages.dev or custom domain',
+              'counter app — Cloudflare pages.dev URL',
+              'tip calculator — Cloudflare pages.dev URL',
+              'vibe-advanced.vercel.app — loads normally',
+              'vibe-advanced.vercel.app/showcase — all 5 projects visible',
+              'workers.dev/status — returns JSON in the browser',
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', marginBottom: 4 }}>
+                <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                <span>{item}</span>
+              </div>
+            ))}
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '16px 0 8px', lineHeight: 1.7 }}>
               <strong>Test status dots:</strong>
             </p>
-            <ul style={{ paddingLeft: 24, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
-              {[
-                'All 5 dots show green on vibe-hub',
-                'All 5 dots show green on /showcase',
-                'Open vibe-hub/src/data/projects.js locally → temporarily change one URL to https://this-does-not-exist-123.com → run npm run dev → confirm that project\'s dot turns red → revert the change → confirm it goes green again',
-              ].map((item, i) => (
-                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '12px 0 8px', lineHeight: 1.7 }}>
-              <strong>Test React Router fix:</strong>
+            {[
+              'All 5 dots green on vibe-hub',
+              'All 5 dots green on /showcase',
+              'In vibe-hub locally: temporarily change one URL in projects.js to https://this-does-not-exist-999.com → npm run dev → confirm that card goes red → revert → confirm it goes green again',
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', marginBottom: 4 }}>
+                <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                <span>{item}</span>
+              </div>
+            ))}
+            <p style={{ fontSize: 13, color: 'var(--muted)', margin: '16px 0 8px', lineHeight: 1.7 }}>
+              <strong>Test the _redirects fix:</strong>
             </p>
-            <ul style={{ paddingLeft: 24, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', listStyle: 'none' }}>
-              {[
-                'On vibe-hub: navigate to any non-root path by typing it in the address bar → confirm no 404',
-                'On counter app: same test',
-                'On tip calculator: same test',
-              ].map((item, i) => (
-                <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            {[
+              'On vibe-hub: type a non-root path directly in the address bar (e.g. /about) → confirm no 404',
+              'On counter app: same test',
+              'On tip calculator: same test',
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 13, lineHeight: 1.8, color: 'var(--muted)', marginBottom: 4 }}>
+                <span style={{ color: 'var(--accent)', flexShrink: 0 }}>□</span>
+                <span>{item}</span>
+              </div>
+            ))}
 
-            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '20px 0 10px' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--accent)', margin: '24px 0 10px' }}>
               Redeploy everything cleanly
             </p>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 10, lineHeight: 1.7 }}>
-              Run through these in order — do not skip any:
+              Run through these in order:
             </p>
             <ol style={{ paddingLeft: 24, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: 14, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
-                <strong>vibe-hub:</strong> confirm all project URLs in <code>src/data/projects.js</code> are the
-                final correct live URLs (Cloudflare for counter + tip calculator, Vercel for the rest) →
-                <code>git add . → git commit -m "final: correct project URLs" → git push</code> →
-                watch Cloudflare Pages auto-deploy → confirm deployment completes with no errors
+                <strong>vibe-hub:</strong> confirm all URLs in <code>src/data/projects.js</code> are final and correct
+                (Cloudflare for counter + tip calculator, Vercel for the rest) →
+                VS Code → stage all → commit <strong>"final: correct project URLs"</strong> → Sync Changes →
+                watch auto-deploy: dash.cloudflare.com → Workers &amp; Pages → vibe-hub → Deployments tab →
+                wait for "Success" status
               </li>
               <li>
-                <strong>vibe-status-worker:</strong> in the worker folder run <code>wrangler deploy</code> →
-                confirm the output shows "Published" with no errors → hit the live workers.dev URL one
-                more time to confirm it still returns correct JSON
+                <strong>vibe-status-worker:</strong> in the worker folder terminal:
+                <code>npx wrangler deploy</code> → confirm output shows "Published" with no errors →
+                open the live workers.dev/status URL — confirm correct JSON
               </li>
               <li>
-                <strong>vibe-advanced:</strong> confirm /showcase is working locally with <code>npm run dev</code> →
-                <code>git add . → git commit -m "feat: showcase page with live project status" → git push</code> →
-                watch Vercel auto-deploy → visit vibe-advanced.vercel.app/showcase on the live URL
+                <strong>vibe-advanced:</strong> VS Code → stage all →
+                commit <strong>"feat: showcase with live project status"</strong> → Sync Changes →
+                watch auto-deploy: vercel.com → vibe-advanced → Deployments →
+                visit vibe-advanced.vercel.app/showcase on the live URL — confirm status dots are working
               </li>
             </ol>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['16']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>Every box above is checked. All three repos are on their latest version in production. Every live URL works correctly.</span>
+              <span>Every box above is checked. All three are on their latest version in production and every live URL works correctly.</span>
             </div>
           </div>
 
