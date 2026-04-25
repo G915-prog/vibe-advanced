@@ -938,33 +938,54 @@ export default function Module7() {
               <span className="build-step-title">Deploy vibe-hub to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              Push vibe-hub to a new GitHub repo, then connect it to Cloudflare Pages. Configure
-              the build settings. Trigger the first deploy. This takes about 5 minutes total.
+              MANUAL STEPS — no Claude Code prompt needed for this step.
             </p>
 
-            <SectionLabel text="// concept: cloudflare pages build config" />
-            <LessonHeading main="Build command: npm run build." accent="Output dir: dist." />
-            <LessonText>
-              Cloudflare Pages needs two things: the command to run the build (<code>npm run build</code>)
-              and where to find the output files (<code>dist</code>). Vite always outputs to{' '}
-              <code>dist</code> — not <code>build</code>, which is Create React App. If you type{' '}
-              <code>build</code> instead of <code>dist</code>, your deploy fails with a "no output
-              directory found" error.
-            </LessonText>
-            <LessonText>
-              The <code>_redirects</code> file tells Cloudflare's CDN to serve <code>index.html</code>
-              for every URL — essential for React Router. Without it, navigating directly to any
-              route other than <code>/</code> returns a 404. Place it in the <code>public/</code>{' '}
-              folder so Vite copies it to <code>dist/</code> during the build automatically.
-            </LessonText>
-            <CodeBlock lang="text">{`# public/_redirects — copy-paste exactly as shown
-/* /index.html 200`}</CodeBlock>
+            <ol className="obj-list" style={{ paddingLeft: 20 }}>
+              <li>
+                Go to <strong>dash.cloudflare.com</strong> → click <strong>"Workers &amp; Pages"</strong> in the
+                left sidebar → click the <strong>"Pages"</strong> tab → click <strong>"Create a project"</strong>
+              </li>
+              <li>
+                Click <strong>"Connect to Git"</strong> → if prompted to install the Cloudflare GitHub app,
+                click <strong>"Install &amp; Authorize"</strong> → keep <strong>"All repositories"</strong> selected
+                → click <strong>"Install &amp; Authorize"</strong> → you are redirected back to Cloudflare
+              </li>
+              <li>
+                Find <strong>"vibe-hub"</strong> in your repository list and click <strong>"Begin setup"</strong>
+              </li>
+              <li>
+                Configure build settings <strong>EXACTLY</strong> as follows:
+                <ul style={{ marginTop: 8, marginBottom: 4 }}>
+                  <li><strong>Project name:</strong> vibe-hub</li>
+                  <li><strong>Production branch:</strong> main</li>
+                  <li><strong>Framework preset:</strong> None (do not select React)</li>
+                  <li><strong>Build command:</strong> npm run build</li>
+                  <li><strong>Build output directory:</strong> dist</li>
+                  <li>Leave all other fields empty</li>
+                </ul>
+              </li>
+              <li>
+                Click <strong>"Save and Deploy"</strong> — the first build takes about 2 minutes
+              </li>
+              <li>
+                When the build completes click <strong>"Continue to project"</strong> — you will see a
+                generated URL in the format: <code>vibe-hub.pages.dev</code> or <code>vibe-hub-RANDOM.pages.dev</code>
+              </li>
+              <li>
+                Click the URL and confirm vibe-hub loads with all project cards
+              </li>
+            </ol>
 
-            <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['02']}</CodeBlock>
+            <Callout type="warning">
+              <strong>If you accidentally created a Worker instead of a Pages project:</strong> go to
+              Workers &amp; Pages → find the Worker → click it → Settings → scroll to bottom → Delete.
+              Then start this step again from point 1.
+            </Callout>
+
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>vibe-hub is live at a .pages.dev URL. All 5 project cards are visible. Refreshing a direct URL does not return a 404.</span>
+              <span>vibe-hub is live at a pages.dev URL, all project cards are visible, and no 404 appears on page refresh.</span>
             </div>
           </div>
 
