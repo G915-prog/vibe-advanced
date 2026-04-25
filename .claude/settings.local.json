@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(git -C \"c:/Users/JB/Documents/Claude training\" rev-parse --show-toplevel)",
-      "Bash(git -C \"c:/Users/JB/Documents/Claude training\" ls-files)"
+      "Bash(git -C \"c:/Users/JB/Documents/Claude training\" ls-files)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
