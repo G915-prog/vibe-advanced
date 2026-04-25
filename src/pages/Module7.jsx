@@ -941,7 +941,7 @@ export default function Module7() {
               MANUAL STEPS — no Claude Code prompt needed for this step.
             </p>
 
-            <ol className="obj-list" style={{ paddingLeft: 20 }}>
+            <ol style={{ paddingLeft: 24, margin: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.8, color: 'var(--muted)' }}>
               <li>
                 Go to <strong>dash.cloudflare.com</strong> → click <strong>"Workers &amp; Pages"</strong> in the
                 left sidebar → click the <strong>"Pages"</strong> tab → click <strong>"Create a project"</strong>
@@ -956,7 +956,7 @@ export default function Module7() {
               </li>
               <li>
                 Configure build settings <strong>EXACTLY</strong> as follows:
-                <ul style={{ marginTop: 8, marginBottom: 4 }}>
+                <ul style={{ paddingLeft: 20, marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4, listStyle: 'disc' }}>
                   <li><strong>Project name:</strong> vibe-hub</li>
                   <li><strong>Production branch:</strong> main</li>
                   <li><strong>Framework preset:</strong> None (do not select React)</li>
@@ -969,8 +969,8 @@ export default function Module7() {
                 Click <strong>"Save and Deploy"</strong> — the first build takes about 2 minutes
               </li>
               <li>
-                When the build completes click <strong>"Continue to project"</strong> — you will see a
-                generated URL in the format: <code>vibe-hub.pages.dev</code> or <code>vibe-hub-RANDOM.pages.dev</code>
+                When the build completes click <strong>"Continue to project"</strong> — you will see a generated URL
+                in the format: <code>vibe-hub.pages.dev</code> or <code>vibe-hub-RANDOM.pages.dev</code>
               </li>
               <li>
                 Click the URL and confirm vibe-hub loads with all project cards
