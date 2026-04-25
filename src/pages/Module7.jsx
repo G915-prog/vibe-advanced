@@ -6,7 +6,36 @@ import ModuleNav from '../components/ModuleNav'
 import PromptCard from '../components/PromptCard'
 import { useProgress } from '../hooks/useProgress'
 
-// ── Comparison table ───────────────────────────────────────────────────────
+// ── Architecture diagram ──────────────────────────────────────────────────────
+const ARCH_DIAGRAM = `CLOUDFLARE (Pages + Workers):
+  vibe-hub.pages.dev          ← new hub site, built in this module
+  counter-app.pages.dev       ← migrated from Vercel in this module
+  tip-calculator.pages.dev    ← migrated from Vercel in this module
+  vibe-status.workers.dev     ← Worker built in this module
+
+VERCEL (stays, do not migrate):
+  vibe-advanced.vercel.app    ← has Supabase auth, stays on Vercel
+  quiz-app.vercel.app         ← has Supabase auth, stays on Vercel
+  link-in-bio.vercel.app      ← has Supabase auth, stays on Vercel
+
+INTEGRATION:
+  vibe-hub links to all 5 projects and shows live status for each
+  vibe-advanced gets a /showcase route that also shows all projects
+  The same Cloudflare Worker serves status data to both surfaces
+  projects.js is the single source of truth for project data,
+  manually kept in sync between vibe-hub and vibe-advanced repos`
+
+// ── Migration decision table data ─────────────────────────────────────────────
+const MIGRATION_DECISIONS = [
+  { project: 'vibe-hub',       host: '—',      action: 'Build on Cloudflare',  reason: 'New project, built here' },
+  { project: 'counter',        host: 'Vercel',  action: 'Migrate',              reason: 'No backend, trivial' },
+  { project: 'tip calculator', host: 'Vercel',  action: 'Migrate',              reason: 'No backend, trivial' },
+  { project: 'vibe-advanced',  host: 'Vercel',  action: 'Stay',                 reason: 'Supabase auth URLs tied to domain' },
+  { project: 'quiz app',       host: 'Vercel',  action: 'Stay',                 reason: 'Supabase auth URLs tied to domain' },
+  { project: 'link-in-bio',    host: 'Vercel',  action: 'Stay',                 reason: 'Supabase auth URLs tied to domain' },
+]
+
+// ── Platform comparison ───────────────────────────────────────────────────────
 const COMPARISON_TABLE = `Feature                       Cloudflare Pages       Vercel (Hobby)
 ──────────────────────────────────────────────────────────────────────
 Build minutes / month         500                    6,000
@@ -20,7 +49,7 @@ Cold starts                   None                   Yes
 Built-in analytics            Yes                    No (paid add-on)
 Free SSL                      Yes                    Yes`
 
-// ── Worker code examples ────────────────────────────────────────────────────
+// ── Worker code examples ──────────────────────────────────────────────────────
 const WORKER_MINIMAL = `// The minimal Cloudflare Worker
 export default {
   async fetch(request, env, ctx) {
@@ -83,9 +112,9 @@ compatibility_date = "2024-01-01"
 # Secrets are set via CLI, not stored in this file:
 # wrangler secret put MY_API_KEY`
 
-// ── Step prompts ────────────────────────────────────────────────────────────
+// ── Step prompts ──────────────────────────────────────────────────────────────
 const STEP_PROMPTS = {
-  '02': `Scaffold a new React + Vite project called vibe-hub as a standalone portfolio hub.
+  '01': `Scaffold a new React + Vite project called vibe-hub as a standalone portfolio hub.
 
 Run these commands outside any existing project folder:
   npm create vite@latest vibe-hub -- --template react
@@ -100,12 +129,11 @@ Set up the structure:
 
 Create src/data/projects.js — array of project objects:
 export const PROJECTS = [
-  { id: 'quiz-app',      title: 'Quiz App',        desc: 'Ten questions. 30-second timer. Live leaderboard.',        url: 'https://quiz-app-eosin-one-15.vercel.app',     stack: ['React','Supabase','Vercel'], builtIn: 'Module 5' },
-  { id: 'vibe-advanced', title: 'VIBE:ADVANCED',    desc: 'The course site itself — eight modules, three projects.',  url: 'https://vibe-advanced.vercel.app',             stack: ['React','Vite','Supabase'],   builtIn: 'All modules' },
-  { id: 'tip-calc',      title: 'Tip Calculator',   desc: 'Split bills instantly. Clean, fast, no fluff.',           url: 'https://tip-calculator-phi-seven.vercel.app',  stack: ['React','Vite'],             builtIn: 'Module 1' },
-  { id: 'habit-tracker', title: 'Habit Tracker',    desc: 'Daily habits. Streak tracking. Supabase backend.',        url: 'https://habit-tracker-pearl-chi.vercel.app',   stack: ['React','Supabase'],         builtIn: 'Module 3' },
-  { id: 'counter',       title: 'Counter',          desc: 'The classic first app. Deployed, not just run locally.',  url: 'https://counter-app-five-rouge.vercel.app',    stack: ['React'],                    builtIn: 'Module 1' },
-  { id: 'link-in-bio',   title: 'Link-in-Bio',      desc: 'Custom profile pages, link management, click tracking.', url: 'https://your-link-in-bio.vercel.app',          stack: ['React','Supabase','Vercel'],builtIn: 'Module 6' },
+  { id: 'quiz-app',      title: 'Quiz App',       desc: 'Ten questions. 30-second timer. Live leaderboard.',       url: 'https://quiz-app-eosin-one-15.vercel.app',    stack: ['React','Supabase','Vercel'], builtIn: 'Module 5' },
+  { id: 'vibe-advanced', title: 'VIBE:ADVANCED',  desc: 'The course site itself — eight modules, three projects.',  url: 'https://vibe-advanced.vercel.app',            stack: ['React','Vite','Supabase'],   builtIn: 'All modules' },
+  { id: 'tip-calc',      title: 'Tip Calculator', desc: 'Split bills instantly. Clean, fast, no fluff.',           url: 'https://tip-calculator-phi-seven.vercel.app', stack: ['React','Vite'],             builtIn: 'Module 1' },
+  { id: 'counter',       title: 'Counter',        desc: 'The classic first app. Deployed, not just run locally.',  url: 'https://counter-app-five-rouge.vercel.app',   stack: ['React'],                    builtIn: 'Module 1' },
+  { id: 'link-in-bio',   title: 'Link-in-Bio',    desc: 'Custom profile pages, link management, click tracking.', url: 'https://your-link-in-bio.vercel.app',         stack: ['React','Supabase','Vercel'],builtIn: 'Module 6' },
 ]
 
 Create src/components/ProjectCard.jsx:
@@ -125,12 +153,12 @@ Create src/index.css — modern portfolio aesthetic (NOT ink-on-paper):
   Hover: translateY(-2px), border-color rgba(255,255,255,0.2)
   Font: system-ui, -apple-system, sans-serif (no serifs)`,
 
-  '03': `My vibe-hub React + Vite project is ready. Help me deploy it to Cloudflare Pages via GitHub.
+  '02': `My vibe-hub React + Vite project is ready. Help me deploy it to Cloudflare Pages via GitHub.
 
 1. Initialise git and push to a new GitHub repo:
    git init
    git add .
-   git commit -m "Initial vibe-hub — 6 project cards"
+   git commit -m "Initial vibe-hub — 5 project cards"
    (Create a new empty repo on github.com named "vibe-hub", then:)
    git remote add origin https://github.com/YOUR_USERNAME/vibe-hub.git
    git push -u origin main
@@ -149,9 +177,9 @@ Create src/index.css — modern portfolio aesthetic (NOT ink-on-paper):
    Commit this file and push — Cloudflare picks it up on the next build.
 
 Wait for the deployment to complete (~60 seconds).
-Visit the .pages.dev URL in the browser — all 6 project cards should be visible.`,
+Visit the .pages.dev URL in the browser — all 5 project cards should be visible.`,
 
-  '04': `I need to add a VITE_HUB_VERSION environment variable to my vibe-hub on Cloudflare Pages
+  '03': `I need to add a VITE_HUB_VERSION environment variable to my vibe-hub on Cloudflare Pages
 and display it in the footer.
 
 1. In Cloudflare dashboard → Pages → vibe-hub → Settings → Environment Variables:
@@ -181,7 +209,7 @@ and display it in the footer.
    (If you only changed the env var with no code changes: go to
    Deployments → Retry deployment to force a rebuild with the new var.)`,
 
-  '05': `Set up Cloudflare Workers development environment and scaffold a new Worker project.
+  '04': `Set up Cloudflare Workers development environment and scaffold a new Worker project.
 
 1. Install Wrangler (Cloudflare's CLI):
    npm install -g wrangler
@@ -195,7 +223,7 @@ and display it in the footer.
    When prompted:
      What type of application? → "Hello World" Worker
      Use TypeScript? → No
-     Deploy now? → No (we'll deploy in Step 7)
+     Deploy now? → No (we'll deploy in Step 6)
    cd vibe-status-worker
 
 4. Run locally:
@@ -204,13 +232,13 @@ and display it in the footer.
 Visit http://localhost:8787 — you should see a "Hello World!" response.
 Look at src/index.js — this is the complete minimal Worker structure.`,
 
-  '06': `Replace the placeholder Worker in vibe-status-worker/src/index.js with a real
+  '05': `Replace the placeholder Worker in vibe-status-worker/src/index.js with a real
 status-checking endpoint.
 
 The Worker should:
 1. Export a default object with a fetch() handler
 2. Handle GET /status:
-   - Define PROJECTS array: [{ id, url }] for all 6 projects
+   - Define PROJECTS array: [{ id, url }] for all 5 projects
    - Use Promise.all() to check all URLs in parallel with HEAD requests
    - Use AbortSignal.timeout(5000) on each fetch (slow sites don't block)
    - Return JSON: { projectId: 'online' | 'offline' } for each project
@@ -225,13 +253,12 @@ Project URLs:
   quiz-app:      https://quiz-app-eosin-one-15.vercel.app
   vibe-advanced: https://vibe-advanced.vercel.app
   tip-calc:      https://tip-calculator-phi-seven.vercel.app
-  habit-tracker: https://habit-tracker-pearl-chi.vercel.app
   counter:       https://counter-app-five-rouge.vercel.app
   link-in-bio:   https://your-link-in-bio.vercel.app  ← update this URL
 
 After writing, test with: curl http://localhost:8787/status`,
 
-  '07': `Deploy my vibe-status-worker to production on Cloudflare Workers.
+  '06': `Deploy my vibe-status-worker to production on Cloudflare Workers.
 
 1. Check wrangler.toml is correct:
    name = "vibe-status-worker"
@@ -252,18 +279,17 @@ After writing, test with: curl http://localhost:8787/status`,
      .then(r => r.json())
      .then(console.log)
 
-Save the full Worker URL — you'll need it for Steps 9 and 13.`,
+Save the full Worker URL — you'll need it for Steps 8 and 9.`,
 
-  '08': `In my vibe-advanced React course site, add a Showcase page at /showcase.
+  '07': `In my vibe-advanced React course site, add a Showcase page at /showcase.
 
 1. Create src/data/projects.js (same data as vibe-hub):
 export const PROJECTS = [
-  { id: 'quiz-app',      title: 'Quiz App',        desc: 'Ten questions. 30-second timer. Live leaderboard.',        url: 'https://quiz-app-eosin-one-15.vercel.app',     stack: ['React','Supabase','Vercel'], builtIn: 'Module 5' },
-  { id: 'vibe-advanced', title: 'VIBE:ADVANCED',    desc: 'The course site itself — eight modules, three projects.',  url: 'https://vibe-advanced.vercel.app',             stack: ['React','Vite','Supabase'],   builtIn: 'All modules' },
-  { id: 'tip-calc',      title: 'Tip Calculator',   desc: 'Split bills instantly. Clean, fast, no fluff.',           url: 'https://tip-calculator-phi-seven.vercel.app',  stack: ['React','Vite'],             builtIn: 'Module 1' },
-  { id: 'habit-tracker', title: 'Habit Tracker',    desc: 'Daily habits. Streak tracking. Supabase backend.',        url: 'https://habit-tracker-pearl-chi.vercel.app',   stack: ['React','Supabase'],         builtIn: 'Module 3' },
-  { id: 'counter',       title: 'Counter',          desc: 'The classic first app. Deployed, not just run locally.',  url: 'https://counter-app-five-rouge.vercel.app',    stack: ['React'],                    builtIn: 'Module 1' },
-  { id: 'link-in-bio',   title: 'Link-in-Bio',      desc: 'Custom profile pages, link management, click tracking.', url: 'https://your-link-in-bio.vercel.app',          stack: ['React','Supabase','Vercel'],builtIn: 'Module 6' },
+  { id: 'quiz-app',      title: 'Quiz App',       desc: 'Ten questions. 30-second timer. Live leaderboard.',       url: 'https://quiz-app-eosin-one-15.vercel.app',    stack: ['React','Supabase','Vercel'], builtIn: 'Module 5' },
+  { id: 'vibe-advanced', title: 'VIBE:ADVANCED',  desc: 'The course site itself — eight modules, three projects.',  url: 'https://vibe-advanced.vercel.app',            stack: ['React','Vite','Supabase'],   builtIn: 'All modules' },
+  { id: 'tip-calc',      title: 'Tip Calculator', desc: 'Split bills instantly. Clean, fast, no fluff.',           url: 'https://tip-calculator-phi-seven.vercel.app', stack: ['React','Vite'],             builtIn: 'Module 1' },
+  { id: 'counter',       title: 'Counter',        desc: 'The classic first app. Deployed, not just run locally.',  url: 'https://counter-app-five-rouge.vercel.app',   stack: ['React'],                    builtIn: 'Module 1' },
+  { id: 'link-in-bio',   title: 'Link-in-Bio',    desc: 'Custom profile pages, link management, click tracking.', url: 'https://your-link-in-bio.vercel.app',         stack: ['React','Supabase','Vercel'],builtIn: 'Module 6' },
 ]
 
 2. Create src/pages/Showcase.jsx using vibe-advanced's ink-on-paper aesthetic:
@@ -280,9 +306,9 @@ export const PROJECTS = [
 4. Add NavLink to Header.jsx inside the nav-links section:
    <NavLink to="/showcase">Showcase</NavLink>`,
 
-  '09': `In src/pages/Showcase.jsx in my vibe-advanced codebase, connect the live Cloudflare Worker.
+  '08': `In src/pages/Showcase.jsx in my vibe-advanced codebase, connect the live Cloudflare Worker.
 
-Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 7.
+Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 6.
 
 1. Add to the Showcase component:
    const WORKER_URL = 'https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status'
@@ -300,7 +326,7 @@ Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 7.
 2. On each project card, replace the placeholder status-dot with:
    <span
      className={\`status-dot \${
-       statusLoading           ? 'status-checking' :
+       statusLoading              ? 'status-checking' :
        status[p.id] === 'online'  ? 'status-online'   :
        status[p.id] === 'offline' ? 'status-offline'  :
        'status-checking'
@@ -313,6 +339,42 @@ Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 7.
    .status-online   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5); }
    .status-offline  { background: #ef4444; }
    .status-checking { background: var(--rule); }`,
+
+  '09': `In the vibe-hub React + Vite project, add live status dots from the Cloudflare Worker.
+
+Replace YOUR_WORKER_URL with your actual workers.dev URL.
+
+1. In src/pages/Home.jsx:
+   Add useState, useEffect imports
+   const [status, setStatus] = useState({})
+   const [statusLoading, setStatusLoading] = useState(true)
+
+   useEffect(() => {
+     const WORKER = 'https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status'
+     fetch(WORKER)
+       .then(r => r.json())
+       .then(data => setStatus(data))
+       .catch(() => {})
+       .finally(() => setStatusLoading(false))
+   }, [])
+
+   Pass to each card:
+   <ProjectCard
+     project={p}
+     status={statusLoading ? 'checking' : (status[p.id] ?? 'unknown')}
+   />
+
+2. In src/components/ProjectCard.jsx:
+   Accept status prop
+   Render: <span className={\`project-status project-status--\${status}\`} />
+
+3. Add to src/index.css:
+   .project-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+   .project-status--online   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.4); }
+   .project-status--offline  { background: #ef4444; }
+   .project-status--checking { background: rgba(229,231,235,.15); }
+
+4. Commit and push — Cloudflare Pages redeploys automatically.`,
 
   '11': `Run Lighthouse audits on both deployed sites and optimise where needed.
 
@@ -354,54 +416,66 @@ Replace YOUR_WORKER_URL with your actual workers.dev URL from Step 7.
    - No console errors
    - Works at 375px mobile width in DevTools
 
-4. Update the counter URL in projects.js in both repos:
-   - vibe-hub/src/data/projects.js → update the 'counter' url field
-   - vibe-advanced/src/data/projects.js → update the 'counter' url field
-   Commit and push both.
+4. Note your new counter .pages.dev URL — you'll update projects.js in Step 14.`,
 
-5. Confirm: curl YOUR_WORKER_URL/status shows the counter as 'online'.`,
+  '13': `Migrate the Tip Calculator from Vercel to Cloudflare Pages.
 
-  '13': `In the vibe-hub React + Vite project, add live status dots from the Cloudflare Worker.
+1. In Cloudflare Pages dashboard → Create a project → Connect to Git:
+   Select the tip-calculator GitHub repo.
+   Build command: npm run build
+   Build output directory: dist
+   No environment variables needed.
+   Click Save and Deploy.
 
-Replace YOUR_WORKER_URL with your actual workers.dev URL.
+2. While it deploys, add public/_redirects to the tip-calculator repo:
+   /* /index.html 200
+   Commit and push — triggers a second deploy with the redirects in place.
 
-1. In src/pages/Home.jsx:
-   Add useState, useEffect imports
-   const [status, setStatus] = useState({})
-   const [statusLoading, setStatusLoading] = useState(true)
+3. Once live, test the Cloudflare Pages URL:
+   - Tip calculation and bill splitting work correctly
+   - No console errors
+   - Works at 375px mobile width in DevTools
 
-   useEffect(() => {
-     const WORKER = 'https://vibe-status-worker.YOUR_SUBDOMAIN.workers.dev/status'
-     fetch(WORKER)
-       .then(r => r.json())
-       .then(data => setStatus(data))
-       .catch(() => {})
-       .finally(() => setStatusLoading(false))
-   }, [])
+4. Note your new tip-calculator .pages.dev URL — you'll update projects.js in Step 14.`,
 
-   Pass to each card:
-   <ProjectCard
-     project={p}
-     status={statusLoading ? 'checking' : (status[p.id] ?? 'unknown')}
-   />
+  '14': `Update projects.js in both repos with the new Cloudflare Pages URLs for counter and tip-calc.
 
-2. In src/components/ProjectCard.jsx:
-   Accept status prop
-   Render: <span className={\`project-status project-status--\${status}\`} />
+In vibe-hub/src/data/projects.js:
+  Update the 'counter' url to your new counter .pages.dev URL
+  Update the 'tip-calc' url to your new tip-calculator .pages.dev URL
+  Commit and push — Cloudflare Pages redeploys automatically.
 
-3. Add to src/index.css:
-   .project-status { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-   .project-status--online   { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.4); }
-   .project-status--offline  { background: #ef4444; }
-   .project-status--checking { background: rgba(229,231,235,.15); }
+In vibe-advanced/src/data/projects.js:
+  Same URL updates for 'counter' and 'tip-calc'
+  Commit and push — Vercel redeploys automatically.
 
-4. Commit and push — Cloudflare Pages redeploys automatically.`,
+Check: visit the live vibe-hub — Counter and Tip Calculator card links should now
+point to .pages.dev URLs, not vercel.app.`,
 
-  '14': `Run final deployment checks across all three deployments for Module 7.
+  '15': `Update the Worker's PROJECTS array to check the new Cloudflare Pages URLs for counter and tip-calc.
+
+In vibe-status-worker/src/index.js, update the two entries:
+  { id: 'counter',  url: 'https://your-counter.pages.dev' }       ← your actual CF URL
+  { id: 'tip-calc', url: 'https://your-tip-calc.pages.dev' }      ← your actual CF URL
+
+Leave the three Vercel URLs unchanged (quiz-app, vibe-advanced, link-in-bio stay on Vercel).
+
+Redeploy the Worker:
+  wrangler deploy
+
+Verify:
+  curl YOUR_WORKER_URL/status
+  → counter should show 'online' at the new Cloudflare URL
+  → tip-calc should show 'online' at the new Cloudflare URL
+
+Open both vibe-hub and /showcase in the browser — status dots should all be green.`,
+
+  '16': `Run final deployment checks across all three deployments for Module 7.
 
 vibe-hub (Cloudflare Pages):
   □ Footer shows version from VITE_HUB_VERSION env var (not "dev")
-  □ All 6 project cards render with correct titles, descriptions, and links
+  □ All 5 project cards render with correct titles, descriptions, and links
+  □ Counter and Tip Calculator cards link to .pages.dev URLs (not Vercel)
   □ Status dots appear — green for online projects after a few seconds
   □ Run: npm run build — confirm zero errors
   □ Test in incognito Chrome on mobile (375px viewport)
@@ -413,41 +487,43 @@ vibe-advanced (Vercel — /showcase):
   □ Push all uncommitted changes: git add . && git commit -m "Module 7 complete" && git push
 
 Status Worker (Cloudflare Workers):
-  □ curl YOUR_WORKER_URL/status returns JSON with all 6 project IDs
-  □ Counter App entry shows the Cloudflare Pages URL (not Vercel)
+  □ curl YOUR_WORKER_URL/status returns JSON with all 5 project IDs
+  □ Counter and Tip Calculator entries show the Cloudflare Pages URLs (not Vercel)
   □ wrangler.toml is committed to the Worker repo
   □ No secrets are visible in wrangler.toml
 
-Mark all 14 items in the deployment checklist below as done.`,
+Mark all 16 items in the deployment checklist below as done.`,
 }
 
-// ── Deployment checklist ────────────────────────────────────────────────────
+// ── Deployment checklist ──────────────────────────────────────────────────────
 const DEPLOY_ITEMS = [
-  { key: 'pages_live',    label: 'vibe-hub is live on Cloudflare Pages at a .pages.dev URL' },
-  { key: 'env_var',       label: 'VITE_HUB_VERSION env var confirmed working on the live vibe-hub site — visible in the footer' },
-  { key: 'worker_live',   label: 'Status Worker deployed and returning correct JSON for all 6 projects' },
-  { key: 'worker_cors',   label: 'Worker has correct CORS headers — callable from the browser without errors' },
-  { key: 'showcase_live', label: 'Showcase page live on vibe-advanced at /showcase' },
-  { key: 'showcase_dots', label: 'Showcase shows live status dots sourced from the Cloudflare Worker' },
-  { key: 'hub_dots',      label: 'vibe-hub also shows live status dots from the same Worker endpoint' },
-  { key: 'custom_domain', label: 'Custom domain connected to vibe-hub with valid HTTPS certificate (green padlock)' },
-  { key: 'migration',     label: 'At least one project migrated from Vercel to Cloudflare Pages and confirmed working' },
-  { key: 'lh_hub',        label: 'vibe-hub scores 90+ on Performance in Lighthouse' },
-  { key: 'lh_vibe',       label: 'vibe-advanced scores 90+ on Performance in Lighthouse' },
-  { key: 'wrangler_toml', label: 'wrangler.toml committed to the Worker repo — no secrets inside it' },
-  { key: 'urls_correct',  label: 'All project URLs in projects.js are correct and return 200' },
-  { key: 'mobile',        label: 'Both sites tested in incognito on mobile (375px viewport)' },
+  { key: 'pages_live',       label: 'vibe-hub is live on Cloudflare Pages at a .pages.dev URL' },
+  { key: 'env_var',          label: 'VITE_HUB_VERSION env var confirmed working — visible in the live vibe-hub footer' },
+  { key: 'worker_live',      label: 'Status Worker deployed and returning correct JSON for all 5 projects' },
+  { key: 'worker_cors',      label: 'Worker has correct CORS headers — callable from the browser without errors' },
+  { key: 'showcase_live',    label: 'Showcase page live on vibe-advanced at /showcase' },
+  { key: 'showcase_dots',    label: 'Showcase shows live status dots sourced from the Cloudflare Worker' },
+  { key: 'hub_dots',         label: 'vibe-hub shows live status dots from the same Worker endpoint' },
+  { key: 'custom_domain',    label: 'Custom domain connected to vibe-hub with valid HTTPS certificate (green padlock)' },
+  { key: 'counter_cf',       label: 'Counter App migrated to Cloudflare Pages and confirmed working' },
+  { key: 'tip_cf',           label: 'Tip Calculator migrated to Cloudflare Pages and confirmed working' },
+  { key: 'projects_updated', label: 'projects.js updated in both repos — Counter and Tip Calculator point to .pages.dev URLs' },
+  { key: 'worker_updated',   label: 'Worker PROJECTS array updated to check Cloudflare Pages URLs — redeployed' },
+  { key: 'lh_hub',           label: 'vibe-hub scores 90+ on Performance in Lighthouse' },
+  { key: 'lh_vibe',          label: 'vibe-advanced scores 90+ on Performance in Lighthouse' },
+  { key: 'wrangler_toml',    label: 'wrangler.toml committed to the Worker repo — no secrets inside it' },
+  { key: 'mobile',           label: 'Both sites tested in incognito on mobile (375px viewport)' },
 ]
 
-// ── Self-assessment rubric ──────────────────────────────────────────────────
+// ── Self-assessment rubric ────────────────────────────────────────────────────
 const RUBRIC_CRITERIA = [
   { key: 'pages',    label: 'Cloudflare Pages',      desc: 'vibe-hub deployed and live — env vars set in dashboard, not hardcoded' },
-  { key: 'workers',  label: 'Workers',               desc: 'Status Worker deployed and returning correct JSON with all 6 project IDs' },
+  { key: 'workers',  label: 'Workers',               desc: 'Status Worker deployed and returning correct JSON with all 5 project IDs' },
   { key: 'env',      label: 'Environment variables', desc: 'Set in Cloudflare dashboard, shown in the live footer — not hardcoded in code' },
   { key: 'cors',     label: 'CORS',                  desc: 'Worker callable from both vibe-hub and vibe-advanced without browser errors' },
-  { key: 'domain',   label: 'Custom domain',         desc: 'Connected to vibe-hub with valid HTTPS — green padlock in browser' },
   { key: 'showcase', label: 'Showcase',              desc: 'Live on vibe-advanced at /showcase with correct project data and status dots' },
-  { key: 'migrate',  label: 'Migration',             desc: 'At least one project moved from Vercel to Cloudflare Pages and confirmed working' },
+  { key: 'migrate',  label: 'Migration',             desc: 'Counter and Tip Calculator migrated to Cloudflare Pages — Worker and projects.js updated with .pages.dev URLs' },
+  { key: 'domain',   label: 'Custom domain',         desc: 'Connected to vibe-hub with valid HTTPS — green padlock in browser' },
   { key: 'perf',     label: 'Performance',           desc: 'Both sites score 90+ on Lighthouse — scores documented in Showcase.jsx' },
 ]
 
@@ -465,7 +541,7 @@ function getGrade(score) {
   return                   { grade: 'D',  msg: 'Go back and close the open items.' }
 }
 
-// ── Prompt templates ────────────────────────────────────────────────────────
+// ── Prompt templates ──────────────────────────────────────────────────────────
 const PROMPTS = [
   {
     label: 'Scaffold a Vite + React app for Cloudflare Pages',
@@ -621,9 +697,35 @@ Steps:
 5. Deploy and compare both URLs — they should behave identically.
    You can run both Vercel and Cloudflare deployments simultaneously.`,
   },
+  {
+    label: 'Update project URLs across the stack after a migration',
+    tag: 'Post-migration',
+    text: `After migrating a project from Vercel to Cloudflare Pages, update all URL references.
+
+Files to update:
+1. vibe-hub/src/data/projects.js
+   Change the migrated project's url to the new .pages.dev URL
+   Commit and push — Cloudflare Pages redeploys automatically
+
+2. vibe-advanced/src/data/projects.js
+   Same change in the vibe-advanced repo
+   Commit and push — Vercel redeploys automatically
+
+3. vibe-status-worker/src/index.js
+   Update the url in the PROJECTS array to the new .pages.dev URL
+   Then: wrangler deploy
+
+Verification checklist:
+□ vibe-hub card links to .pages.dev URL
+□ /showcase card links to .pages.dev URL
+□ curl YOUR_WORKER_URL/status — migrated project shows 'online' with new URL
+□ Both sites' status dots still show green for the migrated project
+
+Rule: projects.js and the Worker's PROJECTS array must always be in sync.`,
+  },
 ]
 
-// ── Component ───────────────────────────────────────────────────────────────
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function Module7() {
   const { markComplete } = useProgress()
   const [checks, setChecks] = useState(
@@ -657,116 +759,148 @@ export default function Module7() {
     <div className="wrap">
       <Header variant="module" />
 
-      {/* HERO */}
+      {/* ── HERO ── */}
       <div className="module-hero">
         <div className="module-kicker">Module 07 — Deploy</div>
         <h1>Cloudflare<br /><em>Hosting</em></h1>
         <div className="hero-meta">
-          <div className="meta-item"><strong>Estimated time</strong>6–8 hours</div>
+          <div className="meta-item"><strong>Estimated time</strong>8–10 hours</div>
           <div className="meta-item"><strong>Difficulty</strong>Intermediate</div>
           <div className="meta-item"><strong>Stack</strong>Cloudflare Pages + Workers + React</div>
           <div className="meta-item"><strong>Type</strong>Deployment + Build</div>
         </div>
       </div>
 
-      {/* OBJECTIVES */}
+      {/* ── OBJECTIVES ── */}
       <div className="lesson-section">
         <div className="section-label">// learning objectives</div>
         <ul className="obj-list">
-          <li>Understand what Cloudflare Pages is and when to use it over Vercel</li>
-          <li>Deploy a React + Vite app to Cloudflare Pages from a GitHub repo</li>
-          <li>Set environment variables securely in the Cloudflare dashboard</li>
-          <li>Write and deploy a Cloudflare Worker as a lightweight edge function</li>
-          <li>Connect a custom domain to a Cloudflare Pages deployment</li>
-          <li>Build a standalone projects hub site deployed on Cloudflare Pages</li>
-          <li>Add a live projects showcase section to the VIBE:ADVANCED course site</li>
+          <li>Know exactly which projects to migrate to Cloudflare and which to leave on Vercel — and why</li>
+          <li>Set up a Cloudflare account and navigate the dashboard confidently</li>
+          <li>Deploy a React + Vite app to Cloudflare Pages from GitHub</li>
+          <li>Fix the React Router 404 problem on Cloudflare Pages using a <code>_redirects</code> file</li>
+          <li>Set environment variables in the Cloudflare Pages dashboard</li>
+          <li>Migrate counter and tip calculator from Vercel to Cloudflare Pages</li>
+          <li>Write and deploy a Cloudflare Worker that checks live project status</li>
+          <li>Build vibe-hub — a standalone portfolio hub on Cloudflare Pages</li>
+          <li>Add a /showcase route to vibe-advanced that shows all projects with live status from the Worker</li>
         </ul>
       </div>
 
-      {/* PROJECT OVERVIEW */}
+      {/* ── ARCHITECTURE DIAGRAM ── */}
       <div className="lesson-section">
-        <div className="section-label">Project overview</div>
-        <h2>Two<br /><em>deliverables</em></h2>
-        <p>
-          This module ships two things: a standalone projects hub on Cloudflare Pages, and a new
-          Showcase section on this course site. Both consume data from the same Cloudflare Worker.
+        <div className="section-label">// what you are building</div>
+        <h2>The full<br /><em>project landscape</em></h2>
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: 'var(--muted)', marginBottom: 24, maxWidth: 680 }}>
+          By the end of this module your projects are split across two hosts intentionally.
+          This is the exact architecture every step in the build guide is working towards.
+          Read it before you start — every decision will reference back to it.
         </p>
-        <div className="callout">
-          <p><strong>Deliverable 1 — vibe-hub (Cloudflare Pages)</strong><br />
-          A new standalone site — separate repo, separate deployment — that acts as a visual
-          portfolio of everything built in this course. Each project gets a card with title,
-          description, live URL, tech stack tags, and a live status indicator.</p>
-        </div>
-        <div className="callout">
-          <p><strong>Deliverable 2 — /showcase on VIBE:ADVANCED (Vercel)</strong><br />
-          A new route added to this course site that displays the same projects in a grid,
-          pulls live status from a Cloudflare Worker, and links out to each deployed project.</p>
-        </div>
-        <h2>Projects to<br /><em>showcase</em></h2>
-        <ul className="obj-list">
-          <li>Quiz App — quiz-app-eosin-one-15.vercel.app</li>
-          <li>VIBE:ADVANCED — vibe-advanced.vercel.app</li>
-          <li>Tip Calculator — tip-calculator-phi-seven.vercel.app</li>
-          <li>Habit Tracker — habit-tracker-pearl-chi.vercel.app</li>
-          <li>Counter — counter-app-five-rouge.vercel.app</li>
-          <li>Link-in-Bio — your own deployment URL</li>
-        </ul>
+        <CodeBlock lang="text">{ARCH_DIAGRAM}</CodeBlock>
       </div>
 
-      {/* BUILD GUIDE */}
+      {/* ── DECISION FRAMEWORK ── */}
+      <div className="lesson-section">
+        <div className="section-label">// what to migrate and what to leave</div>
+        <h2>The migration<br /><em>decision</em></h2>
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: 'var(--muted)', marginBottom: 16, maxWidth: 680 }}>
+          Cloudflare Pages and Vercel are both excellent. The migration decision is not about
+          which is better — it's about switching cost vs benefit. Projects with Supabase auth
+          have their redirect URLs, RLS policies, and email templates tied to their current
+          domain. Migrating them means updating all of those, re-testing the full auth flow,
+          and risking breaking working features. The projects with no backend are trivial to
+          migrate — no env vars, no auth, no redirect URLs to update. That's the line.
+        </p>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, marginBottom: 32, marginTop: 8 }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid var(--rule)' }}>
+              {['Project', 'Current host', 'Action', 'Reason'].map(h => (
+                <th key={h} style={{ textAlign: 'left', padding: '8px 16px 8px 0', color: 'var(--text)', fontWeight: 600, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {MIGRATION_DECISIONS.map(row => (
+              <tr key={row.project} style={{ borderBottom: '1px solid var(--rule)' }}>
+                <td style={{ padding: '10px 16px 10px 0', color: 'var(--text)', fontFamily: 'var(--mono)', fontSize: 12 }}>{row.project}</td>
+                <td style={{ padding: '10px 16px 10px 0', color: 'var(--muted)' }}>{row.host}</td>
+                <td style={{ padding: '10px 16px 10px 0', color: row.action === 'Stay' ? 'var(--muted)' : 'var(--accent)', fontWeight: 500 }}>{row.action}</td>
+                <td style={{ padding: '10px 0', color: 'var(--muted)' }}>{row.reason}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <Callout>
+          <strong>The rule of thumb:</strong> if a project has Supabase auth, leave it where it
+          is unless you have a compelling reason to move it and time to re-test everything.
+        </Callout>
+      </div>
+
+      {/* ── CLOUDFLARE ACCOUNT SETUP ── */}
+      <div className="lesson-section">
+        <div className="section-label">// before you start: cloudflare account setup</div>
+        <h2>Get your account<br /><em>ready</em></h2>
+        <p style={{ fontSize: 13, lineHeight: 1.9, color: 'var(--muted)', marginBottom: 24, maxWidth: 680 }}>
+          This is manual dashboard work — no Claude Code prompt needed. Do this once before
+          starting the build guide.
+        </p>
+        <ol className="obj-list" style={{ paddingLeft: 20 }}>
+          <li>
+            <strong>Go to cloudflare.com → Sign up (free, no credit card required).</strong><br />
+            Use the same email as your GitHub account for convenience.
+          </li>
+          <li>
+            <strong>After signup you land on the Cloudflare dashboard.</strong><br />
+            Orientate yourself — the three sections you will use:
+            <ul style={{ marginTop: 8, marginBottom: 4 }}>
+              <li><strong>Pages</strong> (left sidebar) — static site hosting</li>
+              <li><strong>Workers &amp; Pages</strong> (left sidebar) — edge functions</li>
+              <li><strong>DNS</strong> — only needed if you connect a custom domain</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Free tier limits — what you get at zero cost:</strong><br />
+            Pages: 500 builds/month, unlimited bandwidth, unlimited sites, unlimited custom domains.<br />
+            Workers: 100,000 requests/day, 10ms CPU time per request.<br />
+            Analytics: included, no extra cost.
+          </li>
+          <li>
+            <strong>Wrangler (the Workers CLI) is authenticated separately.</strong><br />
+            You'll install and log in to Wrangler in Step 4 of the build guide — it authenticates
+            against your Cloudflare account via the browser. No API keys to copy manually.
+          </li>
+          <li>
+            <strong>Keep this dashboard tab open</strong> during the module — you'll return to it
+            for Pages deployments, environment variables, and custom domain configuration.
+          </li>
+        </ol>
+
+        <SectionLabel text="// free tier vs vercel — how they compare" />
+        <CodeBlock lang="text">{COMPARISON_TABLE}</CodeBlock>
+        <Callout>
+          <strong>The biggest gotcha switching from Vercel:</strong> Cloudflare does not
+          auto-redeploy when you change an environment variable. You must go to Deployments →
+          Retry deployment manually after any env var change. Almost everyone hits this on day one.
+        </Callout>
+      </div>
+
+      {/* ── BUILD GUIDE ── */}
       <div className="challenge-section">
         <div className="section-label">Step-by-step build guide</div>
         <div className="build-guide">
 
-          {/* ── Step 01: Cloudflare vs Vercel ── */}
+          {/* ── Step 01: Scaffold vibe-hub ── */}
           <div className="build-step">
             <div className="build-step-header">
               <span className="build-step-num">01</span>
-              <span className="build-step-title">Cloudflare vs Vercel: pick the right tool</span>
-            </div>
-            <p className="build-step-desc">
-              No code yet. Create a free Cloudflare account at cloudflare.com and orient yourself
-              in the dashboard. Pages, Workers, and DNS are the three sections you'll use in this module.
-            </p>
-
-            <SectionLabel text="// concept: cloudflare pages vs vercel" />
-            <LessonHeading main="Two great hosts." accent="Different tradeoffs." />
-            <LessonText>
-              Cloudflare Pages and Vercel are both excellent static hosting platforms — free tier,
-              instant deploys from GitHub, HTTPS by default. The difference is in the runtime model.
-              Vercel runs serverless functions on AWS Lambda (Node.js, cold starts, regional).
-              Cloudflare runs Workers on V8 isolates across 300+ edge locations globally — no cold
-              starts, sub-millisecond latency from wherever your user is.
-            </LessonText>
-            <LessonText>
-              For pure React apps with no server functions, both are equally good. Cloudflare becomes
-              the better choice when you want edge compute (Workers), unlimited bandwidth, or you're
-              building something where the nearest server to your user actually matters.
-            </LessonText>
-            <CodeBlock lang="text">{COMPARISON_TABLE}</CodeBlock>
-            <Callout>
-              <strong>Key difference to remember:</strong> Vercel auto-redeploys when you change an
-              environment variable. Cloudflare does not — you must trigger a manual redeploy after
-              adding or changing env vars in the dashboard. This trips up almost everyone on their
-              first Cloudflare deployment.
-            </Callout>
-
-            <div className="build-step-done">
-              <span className="step-badge">Done when</span>
-              <span>You can navigate to the Cloudflare Pages dashboard and see the "Create a project" button.</span>
-            </div>
-          </div>
-
-          {/* ── Step 02: Scaffold vibe-hub ── */}
-          <div className="build-step">
-            <div className="build-step-header">
-              <span className="build-step-num">02</span>
               <span className="build-step-title">Scaffold the Projects Hub</span>
             </div>
             <p className="build-step-desc">
               Scaffold a new standalone Vite + React project called vibe-hub. Separate folder,
               separate repo. This is your public portfolio — the first thing a potential employer
-              or collaborator will see when you share the link.
+              or collaborator sees when you share the link.
             </p>
 
             <SectionLabel text="// concept: what makes a good portfolio hub" />
@@ -790,17 +924,17 @@ export default function Module7() {
             </Callout>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['02']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['01']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>npm run dev shows the hub at localhost with all 6 project cards visible. Each card links to a real deployed project.</span>
+              <span><code>npm run dev</code> shows the hub at localhost with all 5 project cards visible. Each card links to a real deployed project.</span>
             </div>
           </div>
 
-          {/* ── Step 03: Deploy to Cloudflare Pages ── */}
+          {/* ── Step 02: Deploy to Cloudflare Pages ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">03</span>
+              <span className="build-step-num">02</span>
               <span className="build-step-title">Deploy vibe-hub to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
@@ -827,17 +961,17 @@ export default function Module7() {
 /* /index.html 200`}</CodeBlock>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['03']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['02']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>vibe-hub is live at a .pages.dev URL. All 6 project cards are visible. Refreshing a direct URL does not return a 404.</span>
+              <span>vibe-hub is live at a .pages.dev URL. All 5 project cards are visible. Refreshing a direct URL does not return a 404.</span>
             </div>
           </div>
 
-          {/* ── Step 04: Environment variables ── */}
+          {/* ── Step 03: Environment variables ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">04</span>
+              <span className="build-step-num">03</span>
               <span className="build-step-title">Environment variables on Cloudflare</span>
             </div>
             <p className="build-step-desc">
@@ -866,17 +1000,17 @@ export default function Module7() {
             </Callout>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['04']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['03']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
               <span>The live .pages.dev site shows "v1.0.0" in the footer. Local dev shows "vdev" — the env var only lives in the Cloudflare dashboard.</span>
             </div>
           </div>
 
-          {/* ── Step 05: Workers intro ── */}
+          {/* ── Step 04: Workers intro ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">05</span>
+              <span className="build-step-num">04</span>
               <span className="build-step-title">Introduction to Cloudflare Workers</span>
             </div>
             <p className="build-step-desc">
@@ -908,21 +1042,21 @@ export default function Module7() {
             </LessonText>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['05']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['04']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
               <span><code>wrangler dev</code> starts without errors. http://localhost:8787 returns a response in the browser.</span>
             </div>
           </div>
 
-          {/* ── Step 06: Build the status Worker ── */}
+          {/* ── Step 05: Build the status Worker ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">06</span>
+              <span className="build-step-num">05</span>
               <span className="build-step-title">Build the project status Worker</span>
             </div>
             <p className="build-step-desc">
-              Write a Worker that accepts GET /status, checks all 6 project URLs in parallel using
+              Write a Worker that accepts GET /status, checks all 5 project URLs in parallel using
               HEAD requests, and returns JSON with the live status of each. Handle errors and
               timeouts gracefully — a slow site shouldn't block the whole response.
             </p>
@@ -946,17 +1080,17 @@ export default function Module7() {
             <CodeBlock lang="js">{WORKER_STATUS_EXAMPLE}</CodeBlock>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['06']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['05']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span><code>curl http://localhost:8787/status</code> returns a JSON object with a status for each of the 6 projects. No key should be missing.</span>
+              <span><code>curl http://localhost:8787/status</code> returns a JSON object with a status for each of the 5 projects. No key should be missing.</span>
             </div>
           </div>
 
-          {/* ── Step 07: Deploy the Worker ── */}
+          {/* ── Step 06: Deploy the Worker ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">07</span>
+              <span className="build-step-num">06</span>
               <span className="build-step-title">Deploy the Worker to production</span>
             </div>
             <p className="build-step-desc">
@@ -982,17 +1116,17 @@ export default function Module7() {
             </Callout>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['07']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['06']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The live workers.dev URL returns the correct status JSON in the browser. All 6 project IDs appear in the response.</span>
+              <span>The live workers.dev URL returns the correct status JSON in the browser. All 5 project IDs appear in the response.</span>
             </div>
           </div>
 
-          {/* ── Step 08: Showcase on VIBE:ADVANCED ── */}
+          {/* ── Step 07: Showcase on VIBE:ADVANCED ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">08</span>
+              <span className="build-step-num">07</span>
               <span className="build-step-title">Add the Showcase section to VIBE:ADVANCED</span>
             </div>
             <p className="build-step-desc">
@@ -1008,17 +1142,17 @@ export default function Module7() {
             </div>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['08']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['07']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>/showcase renders all 6 project cards on the live Vercel deployment. The "Showcase" link appears in the nav.</span>
+              <span>/showcase renders all 5 project cards on the live Vercel deployment. The "Showcase" link appears in the nav.</span>
             </div>
           </div>
 
-          {/* ── Step 09: Connect Worker to Showcase ── */}
+          {/* ── Step 08: Connect Worker to Showcase ── */}
           <div className="build-step">
             <div className="build-step-header">
-              <span className="build-step-num">09</span>
+              <span className="build-step-num">08</span>
               <span className="build-step-title">Connect the status Worker to the Showcase</span>
             </div>
             <p className="build-step-desc">
@@ -1045,10 +1179,30 @@ export default function Module7() {
             <CodeBlock lang="js">{CORS_EXAMPLE}</CodeBlock>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
-            <CodeBlock lang="prompt">{STEP_PROMPTS['09']}</CodeBlock>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['08']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
               <span>The Showcase shows coloured status dots. Online projects show green. DevTools → Network confirms the Worker URL is being called with a 200 response.</span>
+            </div>
+          </div>
+
+          {/* ── Step 09: Wire up vibe-hub ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">09</span>
+              <span className="build-step-title">Wire up vibe-hub with live Worker data</span>
+            </div>
+            <p className="build-step-desc">
+              Add the same status Worker integration to vibe-hub. Both surfaces — vibe-hub on
+              Cloudflare and /showcase on Vercel — now show live status dots from the same Worker
+              endpoint. Same data, two hosts, same experience.
+            </p>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['09']}</CodeBlock>
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>Both vibe-hub (Cloudflare) and /showcase (Vercel) show live status dots. Open both in the same browser window — the status dots reflect the same data.</span>
             </div>
           </div>
 
@@ -1138,16 +1292,15 @@ export default function Module7() {
             </div>
           </div>
 
-          {/* ── Step 12: Migrate one project ── */}
+          {/* ── Step 12: Migrate Counter App ── */}
           <div className="build-step">
             <div className="build-step-header">
               <span className="build-step-num">12</span>
-              <span className="build-step-title">Migrate one project from Vercel to Cloudflare Pages</span>
+              <span className="build-step-title">Migrate the Counter App from Vercel to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              Pick the Counter App — it's the simplest (no backend, no env vars). Connect its
-              GitHub repo to Cloudflare Pages. Confirm it works identically. Update the URL
-              in projects.js in both repos.
+              The Counter App is the simplest project — no backend, no env vars. Connect its
+              GitHub repo to Cloudflare Pages. Confirm it works identically at the new URL.
             </p>
 
             <SectionLabel text="// concept: the migration process" />
@@ -1162,62 +1315,117 @@ export default function Module7() {
             </LessonText>
             <LessonText>
               You don't need to take down the Vercel deployment after migrating — you can run
-              both simultaneously. Update the URL in projects.js so the status Worker checks the
-              Cloudflare URL. The old Vercel URL still works; it's just no longer the canonical one.
+              both simultaneously. The old Vercel URL still works; it's just no longer the
+              canonical one. Update the URL in projects.js (Step 14) after both migrations are done.
             </LessonText>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
             <CodeBlock lang="prompt">{STEP_PROMPTS['12']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>The Counter App is live on a .pages.dev URL. The status Worker reports it as "online". The URL in projects.js is updated in both repos.</span>
+              <span>The Counter App is live at a .pages.dev URL. Counter increments and resets correctly. Note the URL for Step 14.</span>
             </div>
           </div>
 
-          {/* ── Step 13: Wire up vibe-hub with Worker data ── */}
+          {/* ── Step 13: Migrate Tip Calculator ── */}
           <div className="build-step">
             <div className="build-step-header">
               <span className="build-step-num">13</span>
-              <span className="build-step-title">Wire up vibe-hub with live Worker data</span>
+              <span className="build-step-title">Migrate the Tip Calculator from Vercel to Cloudflare Pages</span>
             </div>
             <p className="build-step-desc">
-              Add the same status Worker integration to vibe-hub. Both surfaces — vibe-hub on
-              Cloudflare and /showcase on Vercel — now show live status dots from the same Worker
-              endpoint. Same data, two hosts, same experience.
+              Same process as the Counter App — connect the tip-calculator GitHub repo to
+              Cloudflare Pages. No code changes needed. Confirm the calculator works correctly
+              at the new URL.
             </p>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
             <CodeBlock lang="prompt">{STEP_PROMPTS['13']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>Both vibe-hub (Cloudflare) and /showcase (Vercel) show live status dots. Open both in the same browser window — the status dots should reflect the same data.</span>
+              <span>The Tip Calculator is live at a .pages.dev URL. Tip calculation and bill splitting work correctly. Note the URL for Step 14.</span>
             </div>
           </div>
 
-          {/* ── Step 14: Final checks ── */}
+          {/* ── Step 14: Update projects.js ── */}
           <div className="build-step">
             <div className="build-step-header">
               <span className="build-step-num">14</span>
-              <span className="build-step-title">Final checks and redeploy everything</span>
+              <span className="build-step-title">Update projects.js in both repos</span>
             </div>
             <p className="build-step-desc">
-              Run through the deployment checklist. Trigger a fresh deploy of vibe-hub on
-              Cloudflare Pages. Push the Showcase changes to vibe-advanced. Confirm the Worker
-              returns correct status for all 6 projects. If any checklist item fails, fix it now.
+              Both migrations are done. Update the project URLs in projects.js across both repos
+              so the cards link to the Cloudflare Pages URLs. This is the single source of truth —
+              keep both repos in sync.
             </p>
+
+            <SectionLabel text="// concept: projects.js as single source of truth" />
+            <LessonHeading main="Two repos," accent="one shared data contract." />
+            <LessonText>
+              vibe-hub and vibe-advanced both import a <code>projects.js</code> file that defines
+              the same five projects. These files are in separate repos and not automatically
+              synced — you update them manually whenever a project URL changes. That's the
+              tradeoff of keeping two separate codebases: simpler architecture, manual sync.
+            </LessonText>
+            <LessonText>
+              This is common in real engineering: a "source of truth" that lives in two places
+              and must be kept in sync by discipline, not automation. The alternative (a shared
+              package or API) would be overkill for this use case. The discipline-based approach
+              works as long as you remember to update both when URLs change.
+            </LessonText>
 
             <div className="build-step-prompt-label">// claude code prompt</div>
             <CodeBlock lang="prompt">{STEP_PROMPTS['14']}</CodeBlock>
             <div className="build-step-done">
               <span className="step-badge">Done when</span>
-              <span>All 14 checklist items below are checked. Both sites work in incognito on mobile. The Worker returns correct status JSON for all 6 projects.</span>
+              <span>Counter and Tip Calculator cards in both vibe-hub and /showcase link to .pages.dev URLs. Both repos pushed and live.</span>
+            </div>
+          </div>
+
+          {/* ── Step 15: Update Worker URLs ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">15</span>
+              <span className="build-step-title">Update the Worker's project URLs and redeploy</span>
+            </div>
+            <p className="build-step-desc">
+              The Worker still checks the old Vercel URLs for counter and tip-calc. Update its
+              PROJECTS array to use the new Cloudflare Pages URLs, then redeploy. The Worker
+              should now correctly report status for all five projects at their canonical URLs.
+            </p>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['15']}</CodeBlock>
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span><code>curl YOUR_WORKER_URL/status</code> returns all 5 project IDs. Counter and Tip Calculator show 'online' at their Cloudflare URLs. Status dots on both sites are green.</span>
+            </div>
+          </div>
+
+          {/* ── Step 16: Final checks ── */}
+          <div className="build-step">
+            <div className="build-step-header">
+              <span className="build-step-num">16</span>
+              <span className="build-step-title">Final checks and redeploy everything</span>
+            </div>
+            <p className="build-step-desc">
+              Run through the full deployment checklist. Trigger a fresh deploy of vibe-hub.
+              Push the Showcase changes to vibe-advanced. Confirm the Worker returns correct
+              status for all 5 projects. If any checklist item fails, fix it now.
+            </p>
+
+            <div className="build-step-prompt-label">// claude code prompt</div>
+            <CodeBlock lang="prompt">{STEP_PROMPTS['16']}</CodeBlock>
+            <div className="build-step-done">
+              <span className="step-badge">Done when</span>
+              <span>All 16 checklist items below are checked. Both sites work in incognito on mobile. The Worker returns correct status JSON for all 5 projects.</span>
             </div>
           </div>
 
         </div>
       </div>
 
-      {/* DEPLOYMENT CHECKLIST */}
+      {/* ── DEPLOYMENT CHECKLIST ── */}
       <div className="challenge-section">
         <div className="section-label">Deployment checklist</div>
         <div className="capstone-card">
@@ -1225,7 +1433,7 @@ export default function Module7() {
           <p className="desc">
             Every item on this list is something that commonly works in dev but breaks in
             production — or exposes a gap you haven't addressed. Don't mark the module complete
-            until all 14 are checked.
+            until all {DEPLOY_ITEMS.length} are checked.
           </p>
           <div className="deploy-progress">
             <span className="deploy-count">{checkedCount} / {DEPLOY_ITEMS.length}</span>
@@ -1252,7 +1460,7 @@ export default function Module7() {
         </div>
       </div>
 
-      {/* SELF-ASSESSMENT RUBRIC */}
+      {/* ── SELF-ASSESSMENT RUBRIC ── */}
       <div className="challenge-section">
         <div className="section-label">Self-assessment rubric</div>
         <div className="capstone-card">
@@ -1301,11 +1509,11 @@ export default function Module7() {
         </div>
       </div>
 
-      {/* PROMPT TEMPLATES */}
+      {/* ── PROMPT TEMPLATES ── */}
       <div className="challenge-section">
         <div className="section-label">Prompt templates</div>
         <p style={{ fontSize: 13, lineHeight: 1.9, color: 'var(--muted)', marginBottom: 32, maxWidth: 680 }}>
-          Six copy-paste prompts for the most common Cloudflare tasks. Use these as starting
+          Seven copy-paste prompts for the most common Cloudflare tasks. Use these as starting
           points — Claude Code will adapt them to your specific project structure.
         </p>
         {PROMPTS.map(p => (
@@ -1313,14 +1521,14 @@ export default function Module7() {
         ))}
       </div>
 
-      {/* CAPSTONE TEASER */}
+      {/* ── CAPSTONE TEASER ── */}
       <ComingUp
         kicker="module 08"
         title="Auth & Security"
         desc="Supabase Auth deep-dive, protected routes, RLS policies that actually hold up, OAuth with GitHub. Lock down your apps before you show them to the world."
       />
 
-      {/* MODULE NAV */}
+      {/* ── MODULE NAV ── */}
       <ModuleNav
         prev={{ to: '/module/6', label: '06 Link-in-Bio' }}
         next={{ to: '#', label: '08 Auth & Security' }}
@@ -1329,7 +1537,7 @@ export default function Module7() {
   )
 }
 
-// ── Sub-components ──────────────────────────────────────────────────────────
+// ── Sub-components ────────────────────────────────────────────────────────────
 function SectionLabel({ text }) {
   return (
     <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--faint)', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 16 }}>
